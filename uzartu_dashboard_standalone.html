@@ -1,0 +1,2727 @@
+<!DOCTYPE html>
+<html lang="kk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ұзарту дашборды</title>
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%2341D3F0%22/%3E%3Cstop%20offset%3D%22.6%22%20stop-color%3D%22%233CE6A0%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23FFC145%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect%20width%3D%2264%22%20height%3D%2264%22%20rx%3D%2215%22%20fill%3D%22%230A0E18%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2219%22%20fill%3D%22none%22%20stroke%3D%22%232A3554%22%20stroke-width%3D%228%22/%3E%3Ccircle%20cx%3D%2232%22%20cy%3D%2232%22%20r%3D%2219%22%20fill%3D%22none%22%20stroke%3D%22url%28%23g%29%22%20stroke-width%3D%228%22%20stroke-linecap%3D%22round%22%20stroke-dasharray%3D%22104%20120%22%20transform%3D%22rotate%28-90%2032%2032%29%22/%3E%3C/svg%3E">
+<meta name="theme-color" content="#060913">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Onest:wght@500;600;700;800&family=Sora:wght@700&family=Golos+Text:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.13.2/firebase-firestore-compat.js"></script>
+<script>
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyBPAferqgfepVAvT0mwn_huCzXpVE3fHj4",
+    authDomain: "uzartu-dashboard.firebaseapp.com",
+    projectId: "uzartu-dashboard",
+    storageBucket: "uzartu-dashboard.firebasestorage.app",
+    messagingSenderId: "810479944699",
+    appId: "1:810479944699:web:a078920032abc766e8015e"
+  };
+</script>
+<style>
+  :root{
+    --ink:#0A0E18;
+    --surface:#131A2B;
+    --surface-2:#1B2440;
+    --surface-3:#232E4F;
+    --line:#2A3554;
+    --text:#EAEEF7;
+    --text-dim:#8A93AC;
+    --text-faint:#5D6786;
+    --sky:#3EC6E0;
+    --sky-soft:rgba(62,198,224,.14);
+    --gold:#F0B429;
+    --gold-soft:rgba(240,180,41,.16);
+    --silver:#B9C2D6;
+    --silver-soft:rgba(185,194,214,.14);
+    --bronze:#D08A55;
+    --bronze-soft:rgba(208,138,85,.16);
+    --coral:#FF6B6B;
+    --coral-soft:rgba(255,107,107,.14);
+    --mint:#3ECF8E;
+    --mint-soft:rgba(62,207,142,.14);
+    --violet:#9B8CFF;
+    --teal:#5EEAD4;
+    --radius:18px;
+  }
+  html[data-theme="light"]{
+    --ink:#F2F4F8;
+    --surface:#FFFFFF;
+    --surface-2:#F1F3F8;
+    --surface-3:#E6E9F1;
+    --line:#DFE3EC;
+    --text:#151B2C;
+    --text-dim:#5B6479;
+    --text-faint:#8891A4;
+    --sky:#0C87A8;
+    --sky-soft:rgba(12,135,168,.10);
+    --gold:#A9760D;
+    --gold-soft:rgba(169,118,13,.12);
+    --silver:#7C8598;
+    --silver-soft:rgba(124,133,152,.12);
+    --bronze:#A25E2E;
+    --bronze-soft:rgba(162,94,46,.12);
+    --coral:#D5424A;
+    --coral-soft:rgba(213,66,74,.10);
+    --mint:#12945F;
+    --mint-soft:rgba(18,148,95,.10);
+    --violet:#6D5CD1;
+    --teal:#0E8F80;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(1100px 500px at 15% -10%, rgba(62,198,224,.10), transparent 60%),
+      radial-gradient(900px 500px at 100% 0%, rgba(240,180,41,.07), transparent 55%),
+      var(--ink);
+    color:var(--text);
+    font-family:'Inter',system-ui,sans-serif;
+    -webkit-font-smoothing:antialiased;
+    min-height:100vh;
+  }
+  .mono{font-family:'IBM Plex Mono',ui-monospace,monospace;font-variant-numeric:tabular-nums;}
+  .display{font-family:'Onest','Golos Text',system-ui,sans-serif;}
+  .layout{max-width:1280px;margin:0 auto;padding:28px 20px 80px;display:flex;gap:24px;align-items:flex-start;}
+  .page{flex:1;min-width:0;}
+
+  /* ---------- nav panel (control panel) ---------- */
+  .nav-panel{
+    width:196px;flex-shrink:0;position:sticky;top:20px;
+    background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:16px 14px;display:flex;flex-direction:column;gap:4px;
+  }
+  .nav-title{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);margin:0 0 8px;font-weight:700;}
+  .nav-item{
+    display:flex;align-items:center;gap:8px;text-align:left;
+    background:transparent;border:1px solid transparent;color:var(--text-dim);
+    font-size:13.5px;font-weight:600;padding:10px 12px;border-radius:10px;cursor:pointer;font-family:inherit;
+  }
+  .nav-item:hover{background:var(--surface-2);}
+  .nav-item.active{background:var(--surface-3);border-color:var(--sky);color:var(--text);}
+  .nav-badge{
+    margin-left:auto;background:var(--sky-soft);color:var(--sky);font-size:11px;font-weight:700;
+    border-radius:20px;padding:1px 8px;font-family:'IBM Plex Mono',monospace;
+  }
+
+  @media(max-width:900px){
+    .layout{flex-direction:column;}
+    .nav-panel{width:100%;position:static;flex-direction:row;overflow-x:auto;}
+    .nav-item{flex:0 0 auto;}
+  }
+
+  .upload-error{
+    display:none;background:var(--coral-soft);border:1px solid rgba(255,107,107,.35);
+    color:#ffd9d9;font-size:13px;border-radius:12px;padding:11px 16px;margin-bottom:18px;
+  }
+  .upload-error.show{display:block;}
+
+  a{color:inherit;}
+  button{font-family:inherit;}
+  :focus-visible{outline:2px solid var(--sky);outline-offset:2px;}
+
+  /* ---------- header ---------- */
+  .topbar{display:flex;justify-content:space-between;align-items:flex-start;gap:20px;flex-wrap:wrap;margin-bottom:26px;}
+  .eyebrow{
+    display:inline-flex;align-items:center;gap:8px;
+    font-size:12px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--sky);font-weight:600;margin-bottom:10px;
+  }
+  .eyebrow::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--sky);box-shadow:0 0 0 4px var(--sky-soft);}
+  h1.title{font-size:clamp(28px,4vw,40px);line-height:1.05;margin:0 0 8px;font-weight:700;letter-spacing:-.01em;}
+  .subtitle{color:var(--text-dim);font-size:14.5px;max-width:520px;line-height:1.5;margin:0;}
+
+  .controls{display:flex;flex-direction:column;align-items:flex-end;gap:10px;}
+  .controls-row{display:flex;gap:10px;align-items:center;}
+  .last-update{font-size:12.5px;color:var(--text-faint);text-align:right;}
+  .last-update b{color:var(--text-dim);font-weight:600;}
+
+  .btn{
+    display:inline-flex;align-items:center;gap:8px;
+    border-radius:12px;border:1px solid var(--line);
+    background:var(--surface-2);color:var(--text);
+    font-size:13.5px;font-weight:600;padding:10px 16px;
+    cursor:pointer;transition:transform .12s ease, border-color .12s ease, background .12s ease;
+  }
+  .btn:hover{border-color:var(--sky);background:var(--surface-3);}
+  .btn:active{transform:scale(.97);}
+  .btn.primary{background:linear-gradient(135deg,var(--sky),#2FA9C4);color:#04222A;border-color:transparent;}
+  .btn.primary:hover{filter:brightness(1.08);}
+  .btn.icon{padding:10px;}
+  .btn.ghost{background:transparent;border-color:transparent;color:var(--text-faint);font-size:12.5px;padding:6px 4px;}
+  .btn.ghost:hover{color:var(--sky);background:transparent;border-color:transparent;}
+  .file-input{display:none;}
+
+  .admin-login-box{display:none;gap:8px;align-items:center;margin-top:2px;}
+  .admin-login-box.show{display:flex;}
+  .admin-login-box input{
+    background:var(--surface-2);border:1px solid var(--line);color:var(--text);
+    border-radius:10px;padding:8px 12px;font-size:13px;width:130px;font-family:'IBM Plex Mono',monospace;
+  }
+  .admin-login-box input:focus{border-color:var(--sky);}
+  .admin-login-error{font-size:12px;color:var(--coral);text-align:right;min-height:0;}
+
+  .period-row{display:flex;align-items:center;gap:8px;}
+  .period-row label{font-size:12px;color:var(--text-faint);}
+  .period-select{
+    background:var(--surface-2);border:1px solid var(--line);color:var(--text);
+    border-radius:10px;padding:6px 10px;font-size:13px;font-weight:600;font-family:inherit;cursor:pointer;
+  }
+  .period-select:focus{border-color:var(--sky);}
+  .period-badge{
+    font-size:12px;font-weight:700;letter-spacing:.04em;color:var(--gold);
+    background:var(--gold-soft);border:1px solid rgba(240,180,41,.3);border-radius:20px;padding:5px 12px;
+  }
+  .period-manage-wrap{position:relative;}
+  .period-manage-panel{
+    display:none;position:absolute;top:calc(100% + 6px);right:0;z-index:20;
+    background:var(--surface);border:1px solid var(--line);border-radius:12px;
+    padding:8px;min-width:190px;box-shadow:0 12px 32px rgba(0,0,0,.35);
+  }
+  .period-manage-panel.open{display:block;}
+  .period-manage-row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:7px 6px;font-size:13px;}
+  .period-manage-row:not(:last-child){border-bottom:1px solid var(--line);}
+
+  /* ---------- overall report cards ---------- */
+  .overall-row{display:grid;grid-template-columns:repeat(auto-fit, minmax(160px,1fr));gap:14px;}
+  .overall-card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;}
+  .overall-card .tag{font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;color:var(--text-faint);font-weight:700;}
+  .overall-card.smart .tag{color:var(--sky);}
+  .overall-card.junior .tag{color:var(--gold);}
+  .overall-card .pct{font-size:30px;font-weight:700;margin:8px 0 4px;}
+  .overall-card .frac{font-size:13px;color:var(--text-dim);}
+  .overall-edit{display:flex;gap:6px;align-items:center;margin-top:12px;}
+  .overall-edit input{
+    width:72px;background:var(--surface-2);border:1px solid var(--line);color:var(--text);
+    border-radius:8px;padding:6px 8px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;
+  }
+  .overall-edit input:focus{border-color:var(--sky);}
+  .overall-edit span{color:var(--text-faint);font-size:12px;}
+
+  /* ---------- section headers ---------- */
+  .section-head{display:flex;align-items:baseline;justify-content:space-between;margin:38px 0 16px;flex-wrap:wrap;gap:10px;}
+  .section-head h2{font-size:20px;margin:0;font-weight:700;}
+  .section-head .hint{font-size:12.5px;color:var(--text-faint);}
+
+  /* ---------- top 3 ---------- */
+  .top3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+  .rank-card{
+    position:relative;border-radius:var(--radius);padding:22px 20px 20px;
+    background:var(--surface);border:1px solid var(--line);
+    transition:transform .15s ease;
+  }
+  .rank-card:hover{transform:translateY(-3px);}
+  .rank-card.r1{border-color:rgba(240,180,41,.4);background:linear-gradient(160deg,var(--gold-soft),var(--surface) 55%);}
+  .rank-card.r2{border-color:rgba(185,194,214,.35);background:linear-gradient(160deg,var(--silver-soft),var(--surface) 55%);}
+  .rank-card.r3{border-color:rgba(208,138,85,.35);background:linear-gradient(160deg,var(--bronze-soft),var(--surface) 55%);}
+  .rank-badge{
+    width:34px;height:34px;border-radius:50%;display:flex;align-items:center;justify-content:center;
+    font-family:'Onest','Golos Text',system-ui,sans-serif;font-weight:700;font-size:15px;margin-bottom:14px;
+  }
+  .r1 .rank-badge{background:var(--gold);color:#3A2900;box-shadow:0 0 0 5px var(--gold-soft);}
+  .r2 .rank-badge{background:var(--silver);color:#1c2233;box-shadow:0 0 0 5px var(--silver-soft);}
+  .r3 .rank-badge{background:var(--bronze);color:#2c1806;box-shadow:0 0 0 5px var(--bronze-soft);}
+  .rank-group{font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);font-weight:600;}
+  .rank-subject{font-size:16.5px;font-weight:600;margin:4px 0 14px;line-height:1.25;min-height:42px;}
+  .rank-pct{font-size:34px;font-weight:700;line-height:1;}
+  .rank-meta{display:flex;align-items:baseline;justify-content:space-between;margin-top:8px;}
+  .rank-count{font-size:12.5px;color:var(--text-dim);}
+  .delta{font-size:12px;font-weight:600;padding:2px 7px;border-radius:20px;}
+  .delta.up{color:var(--mint);background:var(--mint-soft);}
+  .delta.down{color:var(--coral);background:var(--coral-soft);}
+  .delta.flat{color:var(--text-faint);background:var(--surface-3);}
+
+  /* ---------- setup banner ---------- */
+  .banner{
+    display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
+    background:var(--coral-soft);border:1px solid rgba(255,107,107,.35);
+    border-radius:14px;padding:13px 18px;margin:20px 0;font-size:13.5px;color:#ffd9d9;
+  }
+  .banner b{color:#fff;}
+  .banner .btn{background:rgba(255,255,255,.08);border-color:rgba(255,107,107,.4);color:#fff;padding:7px 14px;font-size:12.5px;}
+
+  /* ---------- tabs ---------- */
+  .tabs{display:inline-flex;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;gap:2px;}
+  .tab{
+    border:none;background:transparent;color:var(--text-dim);font-weight:600;font-size:13.5px;
+    padding:8px 18px;border-radius:9px;cursor:pointer;transition:.15s;
+  }
+  .tab.active{background:var(--surface-3);color:var(--text);}
+  .tab.active.smart{color:var(--sky);}
+  .tab.active.junior{color:var(--gold);}
+
+  /* ---------- subject list ---------- */
+  .subject-list{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;}
+  .subject-row{
+    display:grid;grid-template-columns:28px 1fr 220px 150px 76px;align-items:center;gap:14px;
+    padding:13px 20px;border-bottom:1px solid var(--line);
+  }
+  .subject-row:last-child{border-bottom:none;}
+  .subject-row:hover{background:var(--surface-2);}
+  .s-rank{color:var(--text-faint);font-size:13px;font-weight:600;}
+  .s-name{font-size:14.5px;font-weight:500;}
+  .s-name .needs{display:block;font-size:11px;color:var(--coral);font-weight:600;margin-top:2px;}
+  .bar-track{height:8px;border-radius:6px;background:var(--surface-3);overflow:hidden;}
+  .bar-fill{height:100%;border-radius:6px;}
+  .s-count{font-size:13px;color:var(--text-dim);text-align:right;white-space:nowrap;}
+  .s-pct{font-size:15.5px;font-weight:700;text-align:right;}
+
+  @media(max-width:720px){
+    .top3{grid-template-columns:1fr;}
+    .overall-row{grid-template-columns:1fr;}
+    .subject-row{grid-template-columns:22px 1fr 60px;grid-template-areas:"r n n" ". bar bar" ". c p";}
+    .bar-track{display:none;}
+  }
+
+  /* ---------- settings panel ---------- */
+  .panel{
+    display:none;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
+    padding:20px 22px;margin-top:16px;
+  }
+  .panel.open{display:block;}
+  .panel-group-title{font-size:12px;text-transform:uppercase;letter-spacing:.08em;color:var(--text-faint);margin:18px 0 8px;font-weight:700;}
+  .copy-totals-row{display:grid;grid-template-columns:1fr 1fr 1fr auto;gap:12px;align-items:end;}
+  .copy-totals-row label{display:block;font-size:11px;color:var(--text-faint);margin-bottom:4px;}
+  .copy-totals-row select{
+    width:100%;background:var(--surface-2);border:1px solid var(--line);color:var(--text);
+    border-radius:10px;padding:9px 10px;font-size:13px;font-family:inherit;
+  }
+  @media(max-width:640px){ .copy-totals-row{grid-template-columns:1fr;} }
+  .panel-group-title:first-child{margin-top:0;}
+  .panel-row{display:grid;grid-template-columns:1fr 78px 12px 78px 70px 26px;gap:8px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);}
+  .del-btn{
+    background:transparent;border:1px solid var(--line);color:var(--text-faint);
+    border-radius:8px;width:26px;height:26px;font-size:13px;cursor:pointer;line-height:1;
+    display:flex;align-items:center;justify-content:center;transition:.15s;
+  }
+  .del-btn:hover{border-color:var(--coral);color:var(--coral);}
+  .del-btn.confirming{background:var(--coral-soft);border-color:var(--coral);color:var(--coral);font-size:11px;width:auto;padding:0 8px;}
+  .panel-row:last-child{border-bottom:none;}
+  .panel-row label{font-size:13.5px;color:var(--text);}
+  .panel-row .sep{color:var(--text-faint);text-align:center;font-size:13px;}
+  .panel-row input{
+    background:var(--ink);border:1px solid var(--line);color:var(--text);
+    border-radius:8px;padding:7px 10px;font-family:'IBM Plex Mono',monospace;font-size:13px;width:100%;
+  }
+  .panel-row input:focus{border-color:var(--sky);}
+  .save-tick{font-size:12px;color:var(--mint);opacity:0;transition:opacity .2s;}
+  .save-tick.show{opacity:1;}
+
+  /* ---------- empty state ---------- */
+  .empty{
+    text-align:center;padding:70px 20px;border:1px dashed var(--line);border-radius:var(--radius);
+    color:var(--text-dim);margin-top:20px;
+  }
+  .empty .display{font-size:20px;color:var(--text);margin-bottom:8px;}
+  .empty p{max-width:420px;margin:0 auto 20px;font-size:14px;line-height:1.55;}
+
+  .setup-screen{
+    max-width:640px;margin:60px auto;padding:32px 30px;background:var(--surface);
+    border:1px solid var(--line);border-radius:var(--radius);
+  }
+  .setup-screen h1{font-size:22px;margin:0 0 6px;font-weight:700;}
+  .setup-screen p{color:var(--text-dim);font-size:14px;line-height:1.6;}
+  .setup-screen ol{color:var(--text);font-size:14px;line-height:1.9;padding-left:20px;}
+  .setup-screen code{background:var(--surface-3);padding:2px 7px;border-radius:6px;font-family:'IBM Plex Mono',monospace;font-size:12.5px;}
+
+  .loading-overlay{
+    position:fixed;inset:0;background:rgba(10,14,24,.75);backdrop-filter:blur(3px);
+    display:none;align-items:center;justify-content:center;z-index:50;font-size:14px;color:var(--text-dim);
+  }
+  .loading-overlay.show{display:flex;}
+  .spinner{width:16px;height:16px;border-radius:50%;border:2px solid var(--surface-3);border-top-color:var(--sky);
+    animation:spin .8s linear infinite;margin-right:10px;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+  @media (prefers-reduced-motion: reduce){
+    .spinner{animation:none;} .rank-card{transition:none;} .rank-card:hover{transform:none;}
+  }
+
+  footer{margin-top:50px;text-align:center;font-size:12px;color:var(--text-faint);line-height:1.6;}
+
+  /* ---------- qolkhat tab ---------- */
+  .qolkhat-stat{margin-bottom:18px;}
+  .qk-stat-row{display:grid;grid-template-columns:repeat(auto-fit, minmax(110px,1fr));gap:12px;}
+  .qk-stat-card{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:16px;text-align:center;}
+  .qk-stat-num{font-size:28px;font-weight:700;}
+  .qk-stat-lbl{font-size:11px;color:var(--text-dim);text-transform:uppercase;letter-spacing:.05em;margin-top:4px;}
+  .qolkhat-search{
+    width:100%;background:var(--surface-2);border:1px solid var(--line);color:var(--text);
+    border-radius:12px;padding:11px 16px;font-size:14px;margin-bottom:16px;font-family:inherit;
+  }
+  .qolkhat-search:focus{border-color:var(--sky);}
+  .qolkhat-list{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;}
+  .qolkhat-row{
+    display:grid;grid-template-columns:1fr 90px 100px 1fr;gap:12px;align-items:center;
+    padding:13px 20px;border-bottom:1px solid var(--line);
+  }
+  .qolkhat-row:last-child{border-bottom:none;}
+  .qolkhat-row:hover{background:var(--surface-2);}
+  .qolkhat-name{font-size:14.5px;font-weight:600;}
+  .qolkhat-product{
+    font-size:11px;font-weight:700;border-radius:20px;padding:4px 8px;text-align:center;white-space:nowrap;
+  }
+  .qolkhat-stage{
+    font-size:11.5px;font-weight:700;color:var(--gold);background:var(--gold-soft);
+    border-radius:20px;padding:4px 10px;text-align:center;white-space:nowrap;
+  }
+  .qolkhat-subject{font-size:13px;color:var(--text-dim);}
+  .qolkhat-row.qolkhat-row-edit{grid-template-columns:1fr 90px 100px 1fr 26px;gap:8px;}
+  .qolkhat-row-edit input{
+    background:var(--surface-2);border:1px solid var(--line);color:var(--text);
+    border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit;width:100%;
+  }
+  .qolkhat-row-edit input:focus{border-color:var(--sky);}
+  .qolkhat-toolbar{display:flex;gap:8px;align-items:center;margin-bottom:16px;flex-wrap:wrap;}
+  .qolkhat-toolbar .qolkhat-search{margin-bottom:0;flex:1;min-width:180px;}
+  .qk-filter-pills{display:flex;gap:6px;flex-wrap:wrap;}
+  .qk-pill{
+    border:1px solid var(--line);background:var(--surface-2);color:var(--text-dim);
+    font-size:12.5px;font-weight:600;padding:8px 14px;border-radius:20px;cursor:pointer;font-family:inherit;
+  }
+  .reason-badges{display:flex;flex-wrap:wrap;gap:8px;}
+  .reason-badge{
+    font-size:12.5px;font-weight:600;padding:6px 12px;border-radius:20px;
+    background:var(--surface-2);border:1px solid var(--line);color:var(--text-dim);
+  }
+  .reason-badge b{color:var(--text);font-family:'IBM Plex Mono',monospace;}
+  .qk-pill.active{background:var(--surface-3);color:var(--text);}
+  @media(max-width:720px){
+    .qolkhat-row{grid-template-columns:1fr;gap:6px;}
+    .qolkhat-row.qolkhat-row-edit{grid-template-columns:1fr 1fr;}
+    .qolkhat-row-edit .del-btn{grid-column:span 2;justify-self:start;}
+  }
+
+
+  /* =====================================================================
+     DESIGN v2 — "Aurora Control Room"
+     deep-space glass UI, aurora backdrop, ring gauges, staged entrance
+     (overrides the base styles above; all class names are unchanged)
+     ===================================================================== */
+  :root{
+    --ink:#060913;
+    --surface:rgba(18,25,45,.62);
+    --surface-2:rgba(30,40,72,.55);
+    --surface-3:rgba(44,58,104,.55);
+    --line:rgba(130,150,210,.16);
+    --line-strong:rgba(130,150,210,.30);
+    --text:#EEF2FF;
+    --text-dim:#97A2C4;
+    --text-faint:#66729A;
+    --sky:#41D3F0;
+    --gold:#FFC145;
+    --mint:#3CE6A0;
+    --coral:#FF6F7D;
+    --violet:#A78BFF;
+    --glass-blur:blur(18px) saturate(140%);
+    --shadow-lg:0 24px 60px -24px rgba(0,0,0,.65);
+    --radius:22px;
+  }
+  html[data-theme="light"]{
+    --ink:#EEF1FA;
+    --surface:rgba(255,255,255,.72);
+    --surface-2:rgba(240,243,252,.8);
+    --surface-3:rgba(226,231,246,.9);
+    --line:rgba(70,90,150,.14);
+    --line-strong:rgba(70,90,150,.28);
+    --text:#121936;
+    --text-dim:#4F5A7E;
+    --text-faint:#8089A8;
+    --shadow-lg:0 24px 50px -28px rgba(40,60,120,.35);
+  }
+  html{scroll-behavior:smooth;}
+  body{
+    font-family:'Golos Text','Inter',system-ui,sans-serif;
+    background:var(--ink);
+    position:relative;overflow-x:hidden;
+  }
+  /* aurora backdrop */
+  body::before{
+    content:'';position:fixed;inset:-20%;z-index:-2;pointer-events:none;
+    background:
+      radial-gradient(38% 34% at 12% 8%, rgba(65,211,240,.26), transparent 70%),
+      radial-gradient(34% 30% at 88% 4%, rgba(255,193,69,.17), transparent 70%),
+      radial-gradient(40% 36% at 70% 92%, rgba(167,139,255,.20), transparent 70%),
+      radial-gradient(30% 28% at 6% 80%, rgba(60,230,160,.13), transparent 70%);
+    filter:blur(20px);
+    animation:aurora 26s ease-in-out infinite alternate;
+  }
+  /* fine grid + grain */
+  body::after{
+    content:'';position:fixed;inset:0;z-index:-1;pointer-events:none;opacity:.55;
+    background-image:
+      linear-gradient(rgba(140,160,220,.055) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(140,160,220,.055) 1px, transparent 1px);
+    background-size:44px 44px;
+    -webkit-mask-image:radial-gradient(ellipse at 50% 0%, #000 0%, transparent 72%);
+            mask-image:radial-gradient(ellipse at 50% 0%, #000 0%, transparent 72%);
+  }
+  html[data-theme="light"] body::before{opacity:.55;}
+  html[data-theme="light"] body::after{opacity:.35;}
+  @keyframes aurora{
+    0%{transform:translate3d(0,0,0) scale(1);}
+    50%{transform:translate3d(2%,3%,0) scale(1.06);}
+    100%{transform:translate3d(-3%,1%,0) scale(1.02);}
+  }
+  ::selection{background:rgba(65,211,240,.35);}
+  ::-webkit-scrollbar{width:10px;height:10px;}
+  ::-webkit-scrollbar-thumb{background:var(--line-strong);border-radius:10px;}
+
+  .layout{max-width:1360px;gap:28px;padding-top:32px;}
+
+  /* ---------- glass surfaces ---------- */
+  .nav-panel,.overall-card,.rank-card,.subject-list,.panel,.tabs,.qk-stat-card,.qolkhat-list,.empty,.setup-screen,.period-manage-panel{
+    background:var(--surface);
+    -webkit-backdrop-filter:var(--glass-blur);backdrop-filter:var(--glass-blur);
+    border-color:var(--line);
+  }
+
+  /* ---------- nav ---------- */
+  .nav-panel{width:218px;padding:18px 14px;gap:6px;box-shadow:var(--shadow-lg);top:24px;}
+  .nav-panel::before{
+    content:'JUZ40';display:flex;align-items:center;justify-content:center;
+    align-self:flex-start;height:42px;padding:0 16px;border-radius:14px;margin:0 0 14px 4px;
+    font-family:'Onest','Golos Text',system-ui,sans-serif;font-weight:800;font-size:17px;letter-spacing:.04em;color:#04222A;
+    background:linear-gradient(135deg,var(--sky),var(--mint) 60%,var(--gold));
+    box-shadow:0 10px 28px -8px rgba(65,211,240,.7), inset 0 1px 0 rgba(255,255,255,.5);
+  }
+  .nav-title{letter-spacing:.18em;margin-bottom:6px;padding-left:4px;}
+  .nav-item{
+    position:relative;border-radius:14px;padding:11px 14px;overflow:hidden;
+    transition:background .2s, color .2s, transform .2s;
+  }
+  .nav-item::before{
+    content:'';position:absolute;left:0;top:22%;bottom:22%;width:3px;border-radius:0 3px 3px 0;
+    background:linear-gradient(var(--sky),var(--mint));transform:scaleY(0);transition:transform .25s;
+  }
+  .nav-item:hover{background:var(--surface-2);color:var(--text);transform:translateX(2px);}
+  .nav-item.active{
+    background:linear-gradient(90deg,rgba(65,211,240,.18),rgba(65,211,240,.03));
+    border-color:rgba(65,211,240,.28);color:var(--text);
+  }
+  .nav-item.active::before{transform:scaleY(1);}
+
+  /* ---------- header ---------- */
+  .topbar{margin-bottom:30px;}
+  .eyebrow{
+    padding:6px 14px 6px 12px;border-radius:30px;border:1px solid rgba(65,211,240,.28);
+    background:rgba(65,211,240,.08);letter-spacing:.2em;font-size:11px;
+  }
+  .eyebrow::before{animation:pulse 2.2s ease-in-out infinite;}
+  @keyframes pulse{0%,100%{box-shadow:0 0 0 3px rgba(65,211,240,.18);}50%{box-shadow:0 0 0 8px rgba(65,211,240,0);}}
+  h1.title{
+    font-family:'Onest','Golos Text',system-ui,sans-serif;font-weight:700;
+    font-size:clamp(26px,3.6vw,42px);line-height:1.08;letter-spacing:-.02em;
+    background:linear-gradient(100deg,var(--text) 30%,var(--sky) 62%,var(--mint) 100%);
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+    margin:6px 0 12px;
+  }
+  .subtitle{font-size:15px;max-width:560px;}
+
+  /* ---------- controls ---------- */
+  .btn{
+    border-radius:14px;background:var(--surface-2);
+    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
+    transition:transform .18s cubic-bezier(.2,.8,.2,1), border-color .18s, box-shadow .18s, background .18s;
+  }
+  .btn:hover{transform:translateY(-1px);box-shadow:0 10px 24px -12px rgba(65,211,240,.55);}
+  .btn.primary{
+    background:linear-gradient(135deg,var(--sky),var(--mint));color:#032028;font-weight:700;
+    box-shadow:0 12px 28px -12px rgba(65,211,240,.8), inset 0 1px 0 rgba(255,255,255,.45);
+  }
+  .btn.primary:hover{filter:brightness(1.07);box-shadow:0 16px 34px -12px rgba(65,211,240,.95), inset 0 1px 0 rgba(255,255,255,.45);}
+  .period-select{border-radius:12px;background:var(--surface-2);padding:8px 12px;transition:border-color .2s, box-shadow .2s;}
+  .period-select:focus{box-shadow:0 0 0 3px rgba(65,211,240,.2);}
+  .last-update{letter-spacing:.02em;}
+
+  /* ---------- section headers ---------- */
+  .section-head{margin:46px 0 18px;}
+  .section-head h2{
+    font-family:'Onest','Golos Text',system-ui,sans-serif;font-size:18px;font-weight:700;letter-spacing:-.01em;
+    display:flex;align-items:center;gap:12px;
+  }
+  .section-head h2::before{
+    content:'';width:26px;height:4px;border-radius:4px;
+    background:linear-gradient(90deg,var(--sky),var(--gold));
+  }
+
+  /* ---------- overall cards (hero) ---------- */
+  .overall-row{grid-template-columns:repeat(auto-fit,minmax(230px,1fr));gap:18px;}
+  .overall-card{
+    --c:var(--sky);--p:0;
+    position:relative;overflow:hidden;isolation:isolate;
+    padding:22px 24px 22px;border-radius:var(--radius);
+    box-shadow:var(--shadow-lg), inset 0 1px 0 rgba(255,255,255,.06);
+    transition:transform .3s cubic-bezier(.2,.8,.2,1), border-color .3s, box-shadow .3s;
+  }
+  .overall-card::before{ /* colored glow bleeding from the corner */
+    content:'';position:absolute;z-index:-1;width:200px;height:200px;right:-70px;top:-90px;border-radius:50%;
+    background:radial-gradient(circle,color-mix(in srgb,var(--c) 38%,transparent),transparent 68%);
+    opacity:.8;transition:opacity .3s, transform .5s;
+  }
+  .overall-card::after{ /* top accent line */
+    content:'';position:absolute;left:24px;right:24px;top:0;height:2px;border-radius:2px;
+    background:linear-gradient(90deg,transparent,var(--c),transparent);opacity:.9;
+  }
+  .overall-card:hover{
+    transform:translateY(-5px);border-color:color-mix(in srgb,var(--c) 45%,var(--line));
+    box-shadow:0 30px 60px -26px color-mix(in srgb,var(--c) 55%,transparent), inset 0 1px 0 rgba(255,255,255,.08);
+  }
+  .overall-card:hover::before{opacity:1;transform:scale(1.2);}
+  .overall-card .tag{letter-spacing:.14em;font-size:12px;}
+  .overall-card .pct{
+    font-family:'Onest','Golos Text',system-ui,sans-serif;font-size:clamp(30px,3.2vw,40px);font-weight:700;
+    letter-spacing:-.03em;margin:14px 0 6px;line-height:1;
+    text-shadow:0 0 34px color-mix(in srgb,currentColor 45%,transparent);
+  }
+  .overall-card .frac{font-size:13px;letter-spacing:.02em;}
+  .overall-card.total{
+    border-color:transparent;
+    background:
+      linear-gradient(var(--surface-solid,rgba(14,20,38,.86)),var(--surface-solid,rgba(14,20,38,.86))) padding-box,
+      conic-gradient(from var(--spin,0deg),var(--sky),var(--mint),var(--gold),var(--violet),var(--sky)) border-box;
+    border:1.5px solid transparent;
+    animation:spinBorder 9s linear infinite;
+  }
+  html[data-theme="light"] .overall-card.total{--surface-solid:rgba(255,255,255,.92);}
+  @property --spin{syntax:'<angle>';initial-value:0deg;inherits:false;}
+  @keyframes spinBorder{to{--spin:360deg;}}
+  .overall-card.total .pct{
+    background:linear-gradient(100deg,var(--sky),var(--mint) 55%,var(--gold));
+    -webkit-background-clip:text;background-clip:text;color:transparent !important;text-shadow:none;
+  }
+  .overall-edit{margin-top:14px;position:relative;z-index:1;}
+  .overall-edit input,.panel-row input,.qolkhat-search,.qolkhat-row-edit input{border-radius:10px;transition:border-color .2s, box-shadow .2s;}
+  .overall-edit input:focus,.panel-row input:focus,.qolkhat-search:focus{box-shadow:0 0 0 3px rgba(65,211,240,.18);}
+  .del-btn{border-radius:10px;}
+
+  /* ---------- top 3 podium ---------- */
+  .top3{gap:18px;align-items:stretch;grid-template-columns:1fr 1.12fr 1fr;}
+  .rank-card{
+    padding:24px 22px 22px;border-radius:var(--radius);overflow:hidden;isolation:isolate;
+    box-shadow:var(--shadow-lg);
+    transition:transform .3s cubic-bezier(.2,.8,.2,1), box-shadow .3s;
+  }
+  .top3 .rank-card.r1{order:2;transform:translateY(-8px);}
+  .top3 .rank-card.r2{order:1;}
+  .top3 .rank-card.r3{order:3;}
+  .rank-card:hover{transform:translateY(-6px);}
+  .top3 .rank-card.r1:hover{transform:translateY(-14px);}
+  .rank-card::after{ /* sheen sweep */
+    content:'';position:absolute;inset:0;z-index:-1;
+    background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.09) 50%,transparent 65%);
+    transform:translateX(-120%);transition:transform .8s;
+  }
+  .rank-card:hover::after{transform:translateX(120%);}
+  .rank-card.r1{border-color:rgba(255,193,69,.5);background:linear-gradient(165deg,rgba(255,193,69,.2),var(--surface) 60%);box-shadow:0 30px 70px -30px rgba(255,193,69,.55);}
+  .rank-card.r2{border-color:rgba(190,200,225,.4);background:linear-gradient(165deg,rgba(190,200,225,.15),var(--surface) 60%);}
+  .rank-card.r3{border-color:rgba(214,140,90,.42);background:linear-gradient(165deg,rgba(214,140,90,.17),var(--surface) 60%);}
+  .rank-badge{width:38px;height:38px;border-radius:12px;font-size:16px;transform:rotate(-6deg);}
+  .rank-subject{font-size:17px;}
+  .rank-pct{font-family:'Onest','Golos Text',system-ui,sans-serif;font-size:clamp(24px,2.5vw,34px);letter-spacing:-.03em;white-space:nowrap;text-shadow:0 0 30px color-mix(in srgb,currentColor 40%,transparent);}
+  .r1 .rank-pct{font-size:clamp(27px,2.9vw,40px);}
+  .delta{border-radius:20px;}
+
+  /* ---------- banner ---------- */
+  .banner{border-radius:16px;background:linear-gradient(90deg,rgba(255,111,125,.16),rgba(255,111,125,.05));
+    -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);}
+
+  /* ---------- tabs ---------- */
+  .tabs{border-radius:16px;padding:5px;}
+  .tab{border-radius:12px;padding:9px 20px;position:relative;}
+  .tab:hover{color:var(--text);}
+  .tab.active{
+    background:linear-gradient(135deg,var(--surface-3),var(--surface-2));
+    box-shadow:0 8px 20px -10px rgba(0,0,0,.6), inset 0 1px 0 rgba(255,255,255,.08);
+  }
+
+  /* ---------- subject list ---------- */
+  .subject-list{border-radius:var(--radius);box-shadow:var(--shadow-lg);}
+  .subject-row{padding:15px 22px;transition:background .2s, padding-left .25s;position:relative;}
+  .subject-row::before{
+    content:'';position:absolute;left:0;top:18%;bottom:18%;width:3px;border-radius:0 3px 3px 0;
+    background:linear-gradient(var(--sky),var(--mint));transform:scaleY(0);transition:transform .25s;
+  }
+  .subject-row:hover{background:linear-gradient(90deg,rgba(65,211,240,.08),transparent 70%);padding-left:26px;}
+  .subject-row:hover::before{transform:scaleY(1);}
+  .s-rank{font-family:'IBM Plex Mono',monospace;}
+  .s-name{font-weight:600;}
+  .bar-track{height:10px;border-radius:10px;background:color-mix(in srgb,var(--text) 7%,transparent);box-shadow:inset 0 1px 2px rgba(0,0,0,.35);}
+  .bar-fill{
+    border-radius:10px;transform-origin:left center;position:relative;
+    box-shadow:0 0 14px -2px currentColor;
+    background-image:linear-gradient(90deg,rgba(255,255,255,.0),rgba(255,255,255,.28));background-blend-mode:overlay;
+  }
+  .s-pct{font-family:'IBM Plex Mono',monospace;font-size:16px;}
+
+  /* ---------- misc ---------- */
+  .panel{border-radius:var(--radius);box-shadow:var(--shadow-lg);}
+  .qk-stat-card{border-radius:18px;transition:transform .25s;}
+  .qk-stat-card:hover{transform:translateY(-3px);}
+  .qk-stat-num{font-family:'Onest','Golos Text',system-ui,sans-serif;}
+  .qolkhat-list{border-radius:var(--radius);}
+  .qk-pill{transition:.2s;}
+  .qk-pill:hover{border-color:var(--sky);color:var(--text);}
+  .empty{border-style:dashed;border-color:var(--line-strong);}
+  .empty .display{font-size:22px;}
+  .loading-overlay{background:rgba(6,9,19,.7);backdrop-filter:blur(8px);}
+  .spinner{width:22px;height:22px;border-width:3px;border-top-color:var(--mint);}
+  footer{margin-top:60px;opacity:.8;}
+  footer:empty{display:none;}
+
+  /* ---------- entrance choreography (only when the view changes; class set from JS) ---------- */
+  @keyframes riseIn{from{opacity:0;transform:translateY(22px) scale(.985);filter:blur(6px);}to{opacity:1;transform:none;filter:none;}}
+  @keyframes growX{from{transform:scaleX(0);}to{transform:scaleX(1);}}
+  @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+  .anim .overall-card,.anim .rank-card,.anim .section-head,.anim .tabs{
+    animation:riseIn .75s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--i,0) * 70ms);
+  }
+  .anim .subject-row{animation:fadeIn .5s ease both;animation-delay:calc(var(--i,0) * 28ms + 250ms);}
+  .anim .bar-fill{animation:growX 1s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0) * 28ms + 350ms);}
+  .anim .overall-card.total{animation:riseIn .75s cubic-bezier(.2,.8,.2,1) backwards, spinBorder 9s linear infinite;animation-delay:calc(var(--i,0) * 70ms), 0s;}
+  .anim .top3 .rank-card.r1{animation-name:riseIn;}
+
+  @media(max-width:900px){
+    .nav-panel{width:100%;padding:10px;}
+    .nav-panel::before,.nav-title{display:none;}
+    .nav-item:hover{transform:none;}
+    .top3{grid-template-columns:1fr;}
+    .top3 .rank-card.r1,.top3 .rank-card.r2,.top3 .rank-card.r3{order:initial;transform:none;}
+  }
+  @media(max-width:720px){
+    .layout{padding:16px 14px 60px;}
+    .overall-row{grid-template-columns:1fr 1fr;gap:12px;}
+    .overall-card{padding:18px 16px;}
+    .overall-card .pct{font-size:26px;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    body::before,.overall-card.total,.eyebrow::before{animation:none;}
+    .anim *{animation:none !important;}
+    .rank-card:hover,.overall-card:hover,.nav-item:hover{transform:none;}
+  }
+
+  /* ---------- Lucide icons ---------- */
+  .ic{width:1.15em;height:1.15em;flex-shrink:0;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;vertical-align:-.18em;}
+  .nav-item .ic{width:18px;height:18px;opacity:.85;}
+  .nav-item.active .ic{color:var(--sky);opacity:1;}
+  .btn .ic{width:17px;height:17px;}
+  .btn.icon .ic{width:18px;height:18px;}
+  .del-btn .ic{width:14px;height:14px;}
+  .banner .ic,.upload-error .ic{width:16px;height:16px;margin-right:4px;vertical-align:-.2em;}
+  .save-tick .ic{width:13px;height:13px;margin-right:2px;}
+  .setup-screen h1 .ic{width:22px;height:22px;margin-right:6px;}
+  body{text-rendering:optimizeLegibility;font-feature-settings:'kern','liga';}
+  h1.title,.section-head h2,.display{font-synthesis:none;}
+
+  /* ---------- overall card v3 ---------- */
+  .overall-card{padding:20px 22px 22px;display:flex;flex-direction:column;}
+  .overall-card .oc-head{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:30px;flex-wrap:wrap;}
+  .overall-card .tag{display:inline-flex;align-items:center;gap:8px;white-space:nowrap;font-weight:800;letter-spacing:.1em;font-size:11.5px;min-width:0;}
+  .overall-card .tag::before{
+    content:'';width:9px;height:9px;border-radius:50%;background:var(--c);flex-shrink:0;
+    box-shadow:0 0 0 3px color-mix(in srgb,var(--c) 22%,transparent), 0 0 14px var(--c);
+  }
+  .overall-card.total{--c:var(--mint);}
+  .overall-card.total .tag{color:var(--text-dim);}
+  .oc-right{display:flex;align-items:center;gap:5px;flex-shrink:0;}
+  .oc-month{
+    font-size:10.5px;font-weight:700;letter-spacing:.1em;white-space:nowrap;
+    padding:4px 9px;border-radius:20px;color:var(--c);
+    background:color-mix(in srgb,var(--c) 13%,transparent);
+    border:1px solid color-mix(in srgb,var(--c) 30%,transparent);
+  }
+  .overall-card .pct{font-size:clamp(32px,3.1vw,42px);margin:20px 0 16px;white-space:nowrap;}
+  .oc-bar{height:8px;border-radius:8px;overflow:hidden;background:color-mix(in srgb,var(--text) 9%,transparent);box-shadow:inset 0 1px 2px rgba(0,0,0,.3);}
+  .oc-bar i{
+    display:block;height:100%;border-radius:8px;transform-origin:left center;
+    background:linear-gradient(90deg,color-mix(in srgb,var(--c) 55%,transparent),var(--c));
+    box-shadow:0 0 16px color-mix(in srgb,var(--c) 75%,transparent);
+  }
+  .overall-card.total .oc-bar i{background:linear-gradient(90deg,var(--sky),var(--mint) 55%,var(--gold));}
+  .overall-card .frac{display:flex;justify-content:space-between;align-items:baseline;margin-top:13px;font-size:13.5px;}
+  .overall-card .frac b{color:var(--text);font-weight:600;font-size:15px;}
+  .overall-card .del-btn{width:26px;height:26px;}
+  .anim .oc-bar i{animation:growX 1.2s cubic-bezier(.2,.8,.2,1) backwards;animation-delay:calc(var(--i,0) * 70ms + 350ms);}
+  @media(max-width:900px){
+    .top3{gap:12px;}
+    .rank-card{
+      display:grid;grid-template-columns:auto 1fr auto;grid-template-rows:auto auto auto;
+      column-gap:16px;align-items:center;padding:16px 18px;
+    }
+    .top3 .rank-card.r1{padding:18px;}
+    .rank-badge{grid-column:1;grid-row:1/4;margin:0;}
+    .rank-group{grid-column:2;grid-row:1;}
+    .rank-subject{grid-column:2;grid-row:2;margin:2px 0 4px;min-height:0;}
+    .rank-meta{grid-column:2;grid-row:3;margin:0;justify-content:flex-start;gap:10px;}
+    .rank-pct,.r1 .rank-pct{grid-column:3;grid-row:1/4;font-size:clamp(24px,5.5vw,32px);}
+  }
+  /* total = wide summary strip under the product cards */
+  .overall-card.total{
+    grid-column:1/-1;display:grid;grid-template-columns:auto auto minmax(120px,1fr) auto;align-items:center;column-gap:32px;
+    padding:20px 28px;
+  }
+  .overall-card.total .oc-head{min-height:0;flex-direction:column;align-items:flex-start;gap:10px;}
+  .overall-card.total .pct{margin:0;font-size:clamp(34px,3.4vw,48px);}
+  .overall-card.total .frac{margin:0;flex-direction:column;align-items:flex-end;gap:2px;}
+  .overall-card.total .oc-bar{height:12px;}
+  @media(max-width:720px){
+    .overall-card.total{grid-template-columns:1fr auto;row-gap:12px;column-gap:12px;padding:16px;}
+    .overall-card.total .oc-head{grid-column:1/-1;flex-direction:row;align-items:center;justify-content:space-between;}
+    .overall-card.total .oc-bar{grid-column:1/-1;order:3;}
+    .overall-card.total .frac{align-items:flex-end;}
+  }
+  @media(max-width:720px){
+    .overall-card{padding:16px 16px 18px;}
+    .overall-card .pct{margin:14px 0 12px;}
+    .oc-month{padding:4px 8px;font-size:9.5px;}
+  }
+
+  /* light theme: darker brand colors need light text on filled elements */
+  html[data-theme="light"] .btn.primary,html[data-theme="light"] .nav-panel::before{color:#fff;}
+  html[data-theme="light"] .btn.primary{box-shadow:0 12px 26px -12px rgba(12,135,168,.7), inset 0 1px 0 rgba(255,255,255,.35);}
+  html[data-theme="light"] .rank-card.r1 .rank-badge,html[data-theme="light"] .rank-card.r3 .rank-badge{color:#fff;}
+  /* ---------- overall grid: columns follow the number of product cards (--n) ---------- */
+  .overall-row{grid-template-columns:repeat(var(--n,3),minmax(0,1fr));}
+  @media(max-width:1179px){
+    .overall-row{grid-template-columns:repeat(2,minmax(0,1fr));}
+    /* a lone last product card fills the row instead of leaving a hole */
+    .overall-row .overall-card:nth-last-child(2):nth-child(odd){grid-column:1/-1;}
+  }
+  @media(max-width:360px){ .overall-row{grid-template-columns:minmax(0,1fr);} }
+  #adminLoginBtn{padding-left:0;}
+
+  /* ---------- mobile polish ---------- */
+  .overall-edit input{flex:1;min-width:0;width:auto;}
+  .overall-edit{width:100%;}
+  @media(max-width:900px){
+    .layout{padding-bottom:104px;}
+    .nav-panel{
+      position:fixed;left:12px;right:12px;bottom:max(12px,env(safe-area-inset-bottom));top:auto;width:auto;z-index:40;
+      flex-direction:row;gap:4px;padding:6px;border-radius:24px;overflow:visible;
+      box-shadow:0 20px 44px -8px rgba(0,0,0,.75), inset 0 1px 0 rgba(255,255,255,.06);
+    }
+    .nav-item{
+      flex:1 1 0;min-width:0;flex-direction:column;justify-content:center;gap:5px;
+      padding:9px 4px 8px;font-size:10.5px;line-height:1.15;text-align:center;border-radius:18px;
+    }
+    .nav-item::before{display:none;}
+    .nav-item .ic{width:21px;height:21px;}
+    .nav-item.active{background:linear-gradient(180deg,rgba(65,211,240,.22),rgba(65,211,240,.06));}
+    .nav-badge{position:absolute;top:4px;right:calc(50% - 26px);margin:0;padding:0 6px;font-size:9.5px;}
+  }
+  @media(max-width:720px){
+    .topbar{gap:18px;margin-bottom:22px;position:relative;}
+    #themeRow{position:absolute;top:-2px;right:0;z-index:2;}
+    #themeRow .btn{padding:8px;}
+    .topbar > div:first-child{width:100%;}
+    .controls{width:100%;align-items:stretch;gap:12px;}
+    .controls-row{flex-wrap:wrap;justify-content:flex-start;}
+    #adminControls .btn.primary{flex:1 1 auto;justify-content:center;}
+    .period-row{justify-content:space-between;width:100%;}
+    .period-row .period-select{flex:1;min-width:0;}
+    .period-manage-wrap{flex-shrink:0;}
+    .last-update{text-align:left;}
+    .admin-login-error{text-align:left;}
+    .section-head{margin:34px 0 14px;}
+    .section-head .hint{width:100%;}
+    h1.title{font-size:clamp(24px,7vw,32px);}
+    .tabs{display:flex;width:100%;overflow-x:auto;}
+    .tab{flex:1;white-space:nowrap;padding:9px 12px;}
+  }
+
+  /* ---------- mobile: subject rows + lighter rendering ---------- */
+  :root{--surface-solid:rgba(16,22,40,.94);}
+  html[data-theme="light"]{--surface-solid:rgba(255,255,255,.96);}
+  @media(max-width:720px){
+    .subject-row{
+      grid-template-columns:24px minmax(0,1fr) auto;
+      grid-template-areas:"r n p" ". b b" ". c c";
+      row-gap:8px;column-gap:12px;padding:14px 16px;
+    }
+    .subject-row:hover{padding-left:16px;}
+    .s-rank{grid-area:r;}
+    .s-name{grid-area:n;font-size:14.5px;overflow-wrap:anywhere;}
+    .s-pct{grid-area:p;font-size:15px;}
+    .bar-track{grid-area:b;display:block;height:7px;}
+    .s-count{grid-area:c;text-align:left;font-size:12px;}
+    /* big blurred glass layers are expensive on phones: use solid surfaces + static backdrop */
+    .subject-list,.qolkhat-list,.panel,.tabs,.empty,.qk-stat-card,.rank-card,.overall-card,.period-manage-panel{
+      -webkit-backdrop-filter:none;backdrop-filter:none;background:var(--surface-solid);
+    }
+    .rank-card.r1{background:linear-gradient(165deg,rgba(255,193,69,.2),var(--surface-solid) 60%);}
+    .rank-card.r2{background:linear-gradient(165deg,rgba(190,200,225,.15),var(--surface-solid) 60%);}
+    .rank-card.r3{background:linear-gradient(165deg,rgba(214,140,90,.17),var(--surface-solid) 60%);}
+    body::before{animation:none;filter:none;}
+    body::after{display:none;}
+    /* month is already in the section title; the chip would force the card header onto two lines */
+    .overall-card:not(.total) .oc-month{display:none;}
+    .overall-card .oc-head{flex-wrap:nowrap;}
+  }
+
+  /* ---------- sidebar v2 ---------- */
+  .nav-panel{width:248px;padding:22px 14px 16px;gap:4px;}
+  .nav-panel::before{display:none !important;}
+  .brand{display:flex;flex-direction:column;gap:8px;padding:2px 10px 18px;margin-bottom:14px;border-bottom:1px solid var(--line);}
+  .brand-mark{font-family:'Onest','Golos Text',system-ui,sans-serif;font-weight:800;font-size:32px;line-height:1;letter-spacing:-.03em;color:var(--text);}
+  .brand-mark b{
+    font-weight:800;margin-left:1px;
+    background:linear-gradient(120deg,var(--sky),var(--mint) 55%,var(--gold));
+    -webkit-background-clip:text;background-clip:text;color:transparent;
+  }
+  .brand-sub{font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--text-faint);font-weight:700;}
+  .nav-title{padding-left:10px;margin:0 0 8px;display:flex;align-items:center;gap:10px;letter-spacing:.2em;}
+  .nav-title::after{content:'';flex:1;height:1px;background:var(--line);}
+  .nav-item{
+    gap:12px;padding:8px 12px 8px 8px;border-radius:16px;white-space:nowrap;font-size:14px;
+    border:1px solid transparent;
+  }
+  .nav-item::before{display:none;}
+  .nav-item .ic{
+    width:36px;height:36px;padding:9px;border-radius:12px;opacity:1;
+    background:var(--surface-2);border:1px solid var(--line);color:var(--text-dim);
+    transition:background .25s,color .25s,box-shadow .25s,transform .25s;
+  }
+  .nav-item:hover{transform:none;background:color-mix(in srgb,var(--text) 5%,transparent);}
+  .nav-item:hover .ic{color:var(--text);transform:scale(1.06);}
+  .nav-item.active{
+    background:linear-gradient(90deg,rgba(65,211,240,.16),rgba(65,211,240,.02));
+    border-color:rgba(65,211,240,.26);color:var(--text);
+  }
+  .nav-item.active .ic{
+    background:linear-gradient(135deg,var(--sky),var(--mint));color:#04222A;border-color:transparent;
+    box-shadow:0 8px 20px -6px rgba(65,211,240,.75);
+  }
+  html[data-theme="light"] .nav-item.active .ic{color:#fff;}
+  .nav-badge{margin-left:auto;font-size:11px;padding:2px 9px;}
+  @media(max-width:900px){
+    .brand,.nav-title{display:none;}
+    .nav-panel{width:auto;padding:6px;}
+    .nav-item{white-space:normal;padding:9px 4px 8px;gap:5px;border-radius:18px;font-size:10.5px;line-height:1.15;}
+    .nav-badge{position:absolute;top:4px;right:calc(50% - 26px);margin:0;padding:0 6px;font-size:9.5px;}
+    .nav-item .ic{width:22px;height:22px;padding:0;background:none;border:0;box-shadow:none;border-radius:0;color:inherit;}
+    .nav-item.active .ic{background:none;color:var(--sky);box-shadow:none;}
+    html[data-theme="light"] .nav-item.active .ic{color:var(--sky);}
+    .nav-item:hover .ic{transform:none;}
+  }
+
+  /* ---------- sidebar v3: light floating menu (desktop only; phones keep the bottom bar) ---------- */
+  @media(min-width:901px){
+    .nav-panel{
+      width:232px;padding:4px 0 0;gap:6px;top:28px;
+      background:transparent;border:0;box-shadow:none;-webkit-backdrop-filter:none;backdrop-filter:none;
+    }
+    .brand{flex-direction:row;align-items:center;gap:11px;padding:0 8px 24px;margin:0;border:0;}
+    .brand::before{
+      content:'';width:11px;height:11px;border-radius:3px;transform:rotate(45deg);flex-shrink:0;
+      background:linear-gradient(135deg,var(--sky),var(--gold));box-shadow:0 0 18px var(--sky);
+    }
+    .brand-mark{font-size:24px;letter-spacing:-.02em;}
+    .brand-sub,.nav-title{display:none;}
+    .nav-item{
+      padding:13px 14px;gap:13px;border-radius:15px;font-size:13.5px;color:var(--text-dim);
+      border:1px solid transparent;background:transparent;
+    }
+    .nav-item .ic{
+      width:20px;height:20px;padding:0;border:0;border-radius:0;background:none;box-shadow:none;
+      color:currentColor;opacity:.85;
+    }
+    .nav-item:hover{background:color-mix(in srgb,var(--text) 6%,transparent);color:var(--text);}
+    .nav-item:hover .ic{transform:none;opacity:1;}
+    .nav-item.active{
+      color:var(--text);
+      background:
+        linear-gradient(var(--surface-solid),var(--surface-solid)) padding-box,
+        linear-gradient(135deg,rgba(65,211,240,.75),rgba(60,230,160,.12) 48%,rgba(255,193,69,.55)) border-box;
+      box-shadow:0 16px 36px -18px rgba(65,211,240,.65);
+    }
+    .nav-item.active .ic{background:none;color:var(--sky);box-shadow:none;opacity:1;}
+    html[data-theme="light"] .nav-item.active .ic{color:var(--sky);}
+    .nav-badge{margin-left:auto;font-size:11px;padding:1px 8px;flex-shrink:0;}
+  }
+
+  /* brand: single color, Sora */
+  .subtitle:empty{display:none;}
+  .brand-mark,.brand-mark b{
+    font-family:'Sora','Onest',system-ui,sans-serif;font-weight:700;letter-spacing:-.01em;font-variant-numeric:lining-nums;
+    background:none;-webkit-background-clip:border-box;background-clip:border-box;
+    color:var(--text);margin-left:0;
+  }
+</style>
+</head>
+<body>
+
+<div class="loading-overlay" id="loadingOverlay"><div class="spinner"></div><span id="loadingText">Өңделуде…</span></div>
+
+<div class="layout">
+
+  <aside class="nav-panel" id="navPanel">
+    <div class="brand"><span class="brand-mark">JUZ<b>40</b></span><span class="brand-sub">Ұзарту дашборды</span></div>
+    <div class="nav-title">Мәзір</div>
+    <button class="nav-item active" id="navDashboard"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect width="7" height="9" x="3" y="3" rx="1"/><rect width="7" height="5" x="14" y="3" rx="1"/><rect width="7" height="9" x="14" y="12" rx="1"/><rect width="7" height="5" x="3" y="16" rx="1"/></svg> Жалпы дашборд</button>
+    <button class="nav-item" id="navQolkhat"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><rect width="8" height="4" x="8" y="2" rx="1" ry="1"/><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><path d="M12 11h4"/><path d="M12 16h4"/><path d="M8 11h.01"/><path d="M8 16h.01"/></svg> Қолхат жазғандар<span class="nav-badge" id="qolkhatBadge"></span></button>
+    <button class="nav-item" id="navJuzeng"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 7v14"/><path d="M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z"/></svg> IELTS</button>
+  </aside>
+
+  <div class="page">
+
+    <div class="topbar">
+      <div>
+        <div class="eyebrow" id="pageEyebrow">Ұзарту дашборды</div>
+        <h1 class="title" id="pageTitle">Пәндер бойынша ұзарту</h1>
+        <p class="subtitle" id="pageSubtitle"></p>
+      </div>
+      <div class="controls">
+        <div class="controls-row" id="themeRow">
+          <button class="btn icon" id="themeToggle" title="Тема ауыстыру"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></svg></button>
+        </div>
+        <div class="controls-row" id="adminControls" style="display:none">
+          <button class="btn icon" id="settingsBtn" title="Жалпы сандарды баптау"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><line x1="21" x2="14" y1="4" y2="4"/><line x1="10" x2="3" y1="4" y2="4"/><line x1="21" x2="12" y1="12" y2="12"/><line x1="8" x2="3" y1="12" y2="12"/><line x1="21" x2="16" y1="20" y2="20"/><line x1="12" x2="3" y1="20" y2="20"/><line x1="14" x2="14" y1="2" y2="6"/><line x1="8" x2="8" y1="10" y2="14"/><line x1="16" x2="16" y1="18" y2="22"/></svg></button>
+          <label class="btn primary" for="fileInput" id="uploadLabel"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg> Excel файлын жүктеу</label>
+          <input type="file" id="fileInput" class="file-input" accept=".xlsx,.xls">
+          <label class="btn primary" for="qolkhatFileInput" id="qolkhatUploadLabel" style="display:none"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg> Қолхат Excel жүктеу</label>
+          <input type="file" id="qolkhatFileInput" class="file-input" accept=".xlsx,.xls">
+          <label class="btn primary" for="juzengFileInput" id="juzengUploadLabel" style="display:none"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" x2="12" y1="3" y2="15"/></svg> IELTS Excel жүктеу</label>
+          <input type="file" id="juzengFileInput" class="file-input" accept=".xlsx,.xls">
+          <button class="btn icon" id="logoutBtn" title="Админ режимінен шығу"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2v10"/><path d="M18.4 6.6a9 9 0 1 1-12.77.04"/></svg></button>
+        </div>
+        <div class="controls-row" id="viewerControls">
+          <button class="btn ghost" id="adminLoginBtn">Админ кіру</button>
+        </div>
+        <div class="admin-login-box" id="adminLoginBox">
+          <input type="password" id="adminCodeInput" placeholder="Құпия код" autocomplete="off">
+          <button class="btn primary" id="adminCodeSubmit">Кіру</button>
+        </div>
+        <div class="admin-login-error" id="adminLoginError"></div>
+        <div class="period-row" id="periodRow"></div>
+        <div class="period-row" id="dateRow"></div>
+        <div class="period-row" id="juzengPeriodRow"></div>
+        <div class="last-update" id="lastUpdate">Файл әлі жүктелмеген</div>
+      </div>
+    </div>
+
+    <div id="viewDashboard">
+      <div class="upload-error" id="uploadError"></div>
+      <div id="banner"></div>
+      <div id="mainContent"></div>
+
+      <div class="panel" id="settingsPanel">
+        <div class="section-head" style="margin:0 0 6px;">
+          <h2>Пәндердің жалпы саны</h2>
+          <div class="hint">Бұл сандар файлдан алынбайды — өзіңіз енгізесіз, олар сақталып қалады</div>
+        </div>
+        <div id="panelBody"></div>
+
+        <div class="section-head" style="margin-top:26px;">
+          <h2>Жалпы сандарды бірнеше күнге көшіру</h2>
+          <div class="hint">Дұрыс сандары бар бір күнді таңдап, оны басқа күндер аралығына қолданыңыз</div>
+        </div>
+        <div id="copyTotalsPanel"></div>
+      </div>
+    </div>
+
+    <div id="viewQolkhat" style="display:none">
+      <div class="upload-error" id="qolkhatUploadError"></div>
+      <div id="qolkhatContent"></div>
+    </div>
+
+    <div id="viewJuzeng" style="display:none">
+      <div class="upload-error" id="juzengUploadError"></div>
+      <div id="juzengContent"></div>
+    </div>
+
+    <footer id="footerNote"></footer>
+  </div>
+</div>
+
+<script>
+(function(){
+  // Lucide icons (inline SVG, no external request)
+  const ICONS = {"dashboard": "<rect width=\"7\" height=\"9\" x=\"3\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"5\" x=\"14\" y=\"3\" rx=\"1\"/><rect width=\"7\" height=\"9\" x=\"14\" y=\"12\" rx=\"1\"/><rect width=\"7\" height=\"5\" x=\"3\" y=\"16\" rx=\"1\"/>", "clipboard": "<rect width=\"8\" height=\"4\" x=\"8\" y=\"2\" rx=\"1\" ry=\"1\"/><path d=\"M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2\"/><path d=\"M12 11h4\"/><path d=\"M12 16h4\"/><path d=\"M8 11h.01\"/><path d=\"M8 16h.01\"/>", "book": "<path d=\"M12 7v14\"/><path d=\"M3 18a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1h5a4 4 0 0 1 4 4 4 4 0 0 1 4-4h5a1 1 0 0 1 1 1v13a1 1 0 0 1-1 1h-6a3 3 0 0 0-3 3 3 3 0 0 0-3-3z\"/>", "moon": "<path d=\"M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z\"/>", "sun": "<circle cx=\"12\" cy=\"12\" r=\"4\"/><path d=\"M12 2v2\"/><path d=\"M12 20v2\"/><path d=\"m4.93 4.93 1.41 1.41\"/><path d=\"m17.66 17.66 1.41 1.41\"/><path d=\"M2 12h2\"/><path d=\"M20 12h2\"/><path d=\"m6.34 17.66-1.41 1.41\"/><path d=\"m19.07 4.93-1.41 1.41\"/>", "sliders": "<line x1=\"21\" x2=\"14\" y1=\"4\" y2=\"4\"/><line x1=\"10\" x2=\"3\" y1=\"4\" y2=\"4\"/><line x1=\"21\" x2=\"12\" y1=\"12\" y2=\"12\"/><line x1=\"8\" x2=\"3\" y1=\"12\" y2=\"12\"/><line x1=\"21\" x2=\"16\" y1=\"20\" y2=\"20\"/><line x1=\"12\" x2=\"3\" y1=\"20\" y2=\"20\"/><line x1=\"14\" x2=\"14\" y1=\"2\" y2=\"6\"/><line x1=\"8\" x2=\"8\" y1=\"10\" y2=\"14\"/><line x1=\"16\" x2=\"16\" y1=\"18\" y2=\"22\"/>", "upload": "<path d=\"M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4\"/><polyline points=\"17 8 12 3 7 8\"/><line x1=\"12\" x2=\"12\" y1=\"3\" y2=\"15\"/>", "power": "<path d=\"M12 2v10\"/><path d=\"M18.4 6.6a9 9 0 1 1-12.77.04\"/>", "trash": "<path d=\"M3 6h18\"/><path d=\"M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6\"/><path d=\"M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2\"/><line x1=\"10\" x2=\"10\" y1=\"11\" y2=\"17\"/><line x1=\"14\" x2=\"14\" y1=\"11\" y2=\"17\"/>", "pencil": "<path d=\"M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z\"/><path d=\"m15 5 4 4\"/>", "alert": "<path d=\"m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3\"/><path d=\"M12 9v4\"/><path d=\"M12 17h.01\"/>", "check": "<path d=\"M20 6 9 17l-5-5\"/>"};
+  const ic = name => '<svg class="ic" viewBox="0 0 24 24" aria-hidden="true">' + ICONS[name] + '</svg>';
+
+
+  // ---------- theme (applied first, works even on the setup screen) ----------
+  function loadTheme(){
+    try{ return localStorage.getItem('uzartu_theme') || 'dark'; }catch(e){ return 'dark'; }
+  }
+  function saveTheme(t){
+    try{ localStorage.setItem('uzartu_theme', t); }catch(e){}
+  }
+  function applyTheme(theme){
+    document.documentElement.setAttribute('data-theme', theme);
+    const btn = document.getElementById('themeToggle');
+    if(btn) btn.innerHTML = theme==='light' ? ic('moon') : ic('sun');
+  }
+  let currentTheme = loadTheme();
+  applyTheme(currentTheme);
+  const themeBtn = document.getElementById('themeToggle');
+  if(themeBtn){
+    themeBtn.addEventListener('click', ()=>{
+      currentTheme = currentTheme==='light' ? 'dark' : 'light';
+      saveTheme(currentTheme);
+      applyTheme(currentTheme);
+    });
+  }
+
+  // ---------- Firebase setup check ----------
+  const FIREBASE_READY = !!(firebaseConfig.apiKey && firebaseConfig.apiKey.indexOf('ЖОБА_') === -1);
+  if(!FIREBASE_READY){
+    document.querySelector('.layout').innerHTML = `
+      <div class="setup-screen">
+        <h1>${ic('sliders')}Баптау керек</h1>
+        <p>Бұл дашборд деректерді сақтау үшін Firebase (тегін) қолданады. Іске қосу үшін файлдың басындағы <code>firebaseConfig</code> орнына өз жобаңыздың конфигурациясын қойыңыз.</p>
+        <ol>
+          <li><a href="https://console.firebase.google.com" target="_blank" style="color:var(--sky)">console.firebase.google.com</a> сайтында жаңа жоба жасаңыз</li>
+          <li><b>Build → Firestore Database → Create database</b> (test mode)</li>
+          <li><b>Project settings → Your apps → Web (&lt;/&gt;)</b> арқылы конфигурацияны алыңыз</li>
+          <li>Сол кодты осы файлдағы <code>firebaseConfig</code> орнына қойып, қайта сақтаңыз</li>
+        </ol>
+        <p>Толық қадамдық нұсқаулық сізге чатта берілген.</p>
+      </div>`;
+    return;
+  }
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const DB_COL = 'app_data';
+
+  // ---------- config ----------
+  const DEFAULT_GROUPS = ['SMART','JUNIOR']; // starting point; more are auto-discovered from uploads
+  const GROUP_PALETTE = ['var(--sky)','var(--gold)','var(--mint)','var(--coral)','var(--violet)','var(--teal)'];
+  function groupColor(g){
+    const idx = state.knownGroups.indexOf(g);
+    return GROUP_PALETTE[(idx>=0?idx:0) % GROUP_PALETTE.length];
+  }
+  // Display-only renaming: the underlying key stays exactly what's in the Excel file
+  // (e.g. "TURBO") for parsing/matching/storage — only the text shown to people changes.
+  const GROUP_DISPLAY_NAMES = { 'TURBO': 'SMART PRO' };
+  function groupLabel(g){ return GROUP_DISPLAY_NAMES[g] || g; }
+  const ADMIN_CODE = 'ROP2027'; // change this to your own passcode if needed
+
+  const DEFAULT_TOTALS = {
+    'SMART|Қазақстан тарихы|ШІЛДЕ':3699,'SMART|Математика|ШІЛДЕ':2379,'SMART|Биология|ШІЛДЕ':1956,
+    'SMART|Дүниежүзі тарихы|ШІЛДЕ':1635,'SMART|География|ШІЛДЕ':1725,'SMART|Химия|ШІЛДЕ':1578,
+    'SMART|Физика|ШІЛДЕ':857,'SMART|Математикалық сауаттылық|ШІЛДЕ':1024,'SMART|Ағылшын тілі|ШІЛДЕ':388,
+    'SMART|Информатика|ШІЛДЕ':592,'SMART|Құқық негіздері|ШІЛДЕ':485,'SMART|Қазақ әдебиеті|ШІЛДЕ':351,
+    'SMART|Қазақ тілі|ШІЛДЕ':246,'SMART|Орыс әдебиеті|ШІЛДЕ':73,'SMART|Орыс тілі|ШІЛДЕ':70,
+    'JUNIOR|Қазақстан тарихы|ШІЛДЕ':201,'JUNIOR|Математика|ШІЛДЕ':168,'JUNIOR|Биология|ШІЛДЕ':141,
+    'JUNIOR|Дүниежүзі тарихы|ШІЛДЕ':140,'JUNIOR|География|ШІЛДЕ':92,'JUNIOR|Химия|ШІЛДЕ':138,
+    'JUNIOR|Физика|ШІЛДЕ':70,'JUNIOR|Математикалық сауаттылық|ШІЛДЕ':121,'JUNIOR|Ағылшын тілі|ШІЛДЕ':64,
+    'JUNIOR|Информатика|ШІЛДЕ':40
+  };
+  // Fixed «жалпы» (denominators) for the «Ұзарту отчеты» cards, key = product|month (TURBO = SMART PRO).
+  // They replace the totals computed from the file; the renewed count (numerator) still comes from the file.
+  // Sum = 36858. Edit here when the plan changes.
+  const OVERALL_TOTALS = {
+    'SMART|ШІЛДЕ':5560, 'SMART|ТАМЫЗ':8706, 'SMART|ҚЫРКҮЙЕК':18655,
+    'JUNIOR|ШІЛДЕ':396, 'JUNIOR|ТАМЫЗ':616, 'JUNIOR|ҚЫРКҮЙЕК':2294,
+    'TURBO|ТАМЫЗ':322, 'TURBO|ҚЫРКҮЙЕК':309
+  };
+  const MONTH_ORDER = ['ҚАҢТАР','АҚПАН','НАУРЫЗ','СӘУІР','МАМЫР','МАУСЫМ','ШІЛДЕ','ТАМЫЗ','ҚЫРКҮЙЕК','ҚАЗАН','ҚАРАША','ЖЕЛТОҚСАН'];
+  function sortMonths(list){ return [...list].sort((a,b)=>MONTH_ORDER.indexOf(a)-MONTH_ORDER.indexOf(b)); }
+  const ALL_MONTHS = '__ALL__';
+  function monthLabel(m){ return m===ALL_MONTHS ? 'Барлығы' : m; }
+  // period choice is personal per browser, not shared — everyone picks their own stream to view
+  function loadLocalMonth(){
+    try{ return localStorage.getItem('uzartu_activeMonth'); }catch(e){ return null; }
+  }
+  function saveLocalMonth(m){
+    try{ localStorage.setItem('uzartu_activeMonth', m); }catch(e){}
+  }
+
+  let state = {
+    totals: null,        // {group|subject|month: total}
+    dates: [],            // all uploaded dates, sorted ascending (YYYY-MM-DD)
+    viewingDate: null,    // date currently displayed
+    counts: null,          // {group|subject|month: count} for viewingDate (full breakdown, all months)
+    prevCounts: null,      // counts for the date just before viewingDate
+    activeTab: 'SMART',
+    isAdmin: false,
+    activeMonth: 'ШІЛДЕ',  // currently selected reporting period
+    knownMonths: ['ШІЛДЕ'], // all months ever seen in uploaded files
+    knownGroups: ['SMART','JUNIOR'], // all products/groups ever seen in uploaded files
+    overall: null,          // {smart:{count,total}, junior:{count,total}} manually entered per date
+    view: 'dashboard',       // 'dashboard' | 'qolkhat'
+    qolkhatList: [],          // [{name, stage, subject, product}] from the latest AmoCRM export
+    qolkhatUpdatedAt: null,
+    qolkhatFilter: '',
+    qolkhatProductFilter: '', // '' = all products
+    juzengMonths: [],         // known months for JUZENG data (own vocabulary, e.g. 'TAMYZ')
+    juzengActiveMonth: null,
+    juzengData: null,         // {ielts, levels, reasons, uploadedAt} for the active month
+  };
+
+  function latestDate(){ return state.dates.length ? state.dates[state.dates.length-1] : null; }
+
+  const $ = (sel,root)=> (root||document).querySelector(sel);
+  const el = (tag, cls, html)=>{ const n=document.createElement(tag); if(cls) n.className=cls; if(html!==undefined) n.innerHTML=html; return n; };
+  const setLoading = (on, text)=>{
+    const o = $('#loadingOverlay');
+    if(text) $('#loadingText').textContent = text;
+    o.classList.toggle('show', !!on);
+  };
+  const showUploadError = (msg, targetId)=>{
+    const box = $('#'+(targetId||'uploadError'));
+    box.textContent = '';
+    box.insertAdjacentHTML('beforeend', ic('alert'));
+    box.appendChild(document.createTextNode(msg));
+    box.classList.add('show');
+  };
+  const clearUploadError = (targetId)=>{
+    const box = $('#'+(targetId||'uploadError'));
+    box.textContent = '';
+    box.classList.remove('show');
+  };
+
+  function fmtPct(count,total){
+    if(!total || total<=0) return null;
+    return (count/total)*100;
+  }
+  function pctStr(pct){
+    if(pct===null||pct===undefined) return '—';
+    return pct.toFixed(2).replace('.',',') + '%';
+  }
+  function pctColor(pct){
+    if(pct===null) return 'var(--text-faint)';
+    if(pct < 14) return 'var(--coral)';
+    if(pct < 20) return 'var(--sky)';
+    return 'var(--mint)';
+  }
+
+  // ---------- storage helpers (Firestore + localStorage) ----------
+  async function fsGetJSON(id){
+    try{
+      const doc = await db.collection(DB_COL).doc(id).get();
+      if(doc.exists && doc.data().json) return JSON.parse(doc.data().json);
+    }catch(e){}
+    return null;
+  }
+  async function fsSetJSON(id, obj){
+    try{
+      await db.collection(DB_COL).doc(id).set({
+        json: JSON.stringify(obj),
+        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      return true;
+    }catch(e){ return false; }
+  }
+  async function loadTotals(){
+    const existing = await fsGetJSON('config_totals');
+    if(existing) return existing;
+    await fsSetJSON('config_totals', DEFAULT_TOTALS);
+    return Object.assign({}, DEFAULT_TOTALS);
+  }
+  async function saveTotals(totals){
+    return await fsSetJSON('config_totals', totals);
+  }
+  // Totals now live inside each day's own snapshot (so correcting a total later doesn't
+  // rewrite history for earlier dates). This legacy doc is only used as a one-time seed:
+  // for the very first date ever uploaded, or for old dates saved before this change.
+  let legacyTotalsCache = null;
+  async function getLegacyTotalsFallback(){
+    if(!legacyTotalsCache) legacyTotalsCache = await loadTotals();
+    return legacyTotalsCache;
+  }
+  async function loadPeriod(){
+    const existing = await fsGetJSON('config_period');
+    if(existing) return existing;
+    const def = {active:'ШІЛДЕ', known:['ШІЛДЕ']};
+    await fsSetJSON('config_period', def);
+    return def;
+  }
+  async function savePeriod(period){
+    return await fsSetJSON('config_period', period);
+  }
+  async function loadGroups(){
+    const existing = await fsGetJSON('config_groups');
+    if(existing && existing.length) return existing;
+    await fsSetJSON('config_groups', DEFAULT_GROUPS);
+    return [...DEFAULT_GROUPS];
+  }
+  async function saveGroups(list){
+    return await fsSetJSON('config_groups', list);
+  }
+  async function loadOverall(date){
+    if(!date) return null;
+    return await fsGetJSON('overall_'+date);
+  }
+  async function saveOverallData(date, obj){
+    return await fsSetJSON('overall_'+date, obj);
+  }
+  async function loadQolkhat(){
+    return await fsGetJSON('qolkhat_latest');
+  }
+  async function saveQolkhat(obj){
+    return await fsSetJSON('qolkhat_latest', obj);
+  }
+  async function loadJuzengMonths(){
+    const existing = await fsGetJSON('juzeng_months');
+    return (existing && existing.list) ? existing.list : [];
+  }
+  async function saveJuzengMonths(list){
+    return await fsSetJSON('juzeng_months', {list});
+  }
+  async function loadJuzengSnapshot(month){
+    if(!month) return null;
+    return await fsGetJSON('juzeng_snapshot_'+month);
+  }
+  async function saveJuzengSnapshot(month, data){
+    return await fsSetJSON('juzeng_snapshot_'+month, data);
+  }
+  async function loadDatesIndex(){
+    const d = await fsGetJSON('dates_index');
+    return d || [];
+  }
+  async function saveDatesIndex(dates){
+    await fsSetJSON('dates_index', dates);
+  }
+  async function loadSnapshot(date){
+    if(!date) return null;
+    return await fsGetJSON('snapshot_'+date);
+  }
+  async function saveSnapshot(date, payload){
+    return await fsSetJSON('snapshot_'+date, payload);
+  }
+  // admin flag is per-browser (localStorage), not shared — each device unlocks separately
+  function loadAdminFlag(){
+    try{ return localStorage.getItem('uzartu_admin') === '1'; }catch(e){ return false; }
+  }
+  function saveAdminFlag(on){
+    try{
+      if(on) localStorage.setItem('uzartu_admin', '1');
+      else localStorage.removeItem('uzartu_admin');
+    }catch(e){}
+  }
+
+  // ---------- excel parsing ----------
+  // The platform's "Продукт" column is sometimes wrong (SMART rows holding JUNIOR streams, JUNIOR rows
+  // holding SMART streams, SMART rows holding SMART-PRO streams), so the product is read from the
+  // stream text itself; the row's column is only a fallback when the stream names no product.
+  //   "SMART-PRO" -> TURBO (shown as SMART PRO),  "JUNOR" (typo) -> JUNIOR
+  const PRODUCT_ALIASES = { 'SMART-PRO':'TURBO', 'SMARTPRO':'TURBO', 'SMART PRO':'TURBO', 'JUNOR':'JUNIOR' };
+  function normProduct(p){
+    const u = String(p||'').trim().toUpperCase();
+    return PRODUCT_ALIASES[u] || u;
+  }
+  function monthRank(m){ const i = MONTH_ORDER.indexOf(m); return i<0 ? 999 : i; }
+  function isToeflItp(raw){ return /^TOEFL\s+ITP(\s|$)/i.test(String(raw).trim()); }
+
+  // Extracts {subject, month, product} from a "Продленный поток"/"Поток" cell. product is '' when the
+  // text names none. Known cell shapes:
+  //  A) "Математика SMART ШІЛДЕ 11 СЫНЫП 2027"   (subject first, space-delimited)
+  //  B) "SMART-PRO | ДЖТ-АНГЛ IELTS | ТАМЫЗ"      (pipe-delimited combo; middle segment is the subject)
+  //  C) "TOEFL ITP ҚЫРКҮЙЕК"                      (no product token; month must come from the student's other streams)
+  function extractStream(raw){
+    raw = String(raw).trim();
+    if(raw.includes('|')){
+      const parts = raw.split('|').map(s=>s.trim()).filter(Boolean);
+      if(parts.length>=3){
+        return {subject: parts[1], month: parts[2].toUpperCase(), product: normProduct(parts[0])};
+      }
+      return null; // pipe format but not enough segments to be usable
+    }
+    const names = ['SMART-PRO','JUNOR', ...state.knownGroups.map(g=>g.toUpperCase())];
+    const upper = raw.toUpperCase();
+    let cut = -1, token = '';
+    names.forEach(n=>{
+      const re = new RegExp('(^|\\s)'+n.replace(/[\\^$*+?.()|[\]{}]/g,'\\$&')+'(?=\\s|$)');
+      const m = re.exec(upper);
+      if(m){
+        const at = m.index + m[1].length;
+        if(cut<0 || at<cut){ cut = at; token = n; }
+      }
+    });
+    if(cut>0){
+      let subject = raw.slice(0,cut).trim();
+      subject = subject.replace(/\s+(ГУМ|ТЕХ)$/iu,'').trim();
+      const remainder = raw.slice(cut+token.length).trim();
+      const month = (remainder.split(/\s+/)[0] || '').toUpperCase();
+      return {subject, month, product: normProduct(token)};
+    }
+    // Fallback: no product token (e.g. "TOEFL ITP ҚЫРКҮЙЕК"). The last word must be a known month.
+    const tokens = raw.split(/\s+/);
+    if(tokens.length>=2){
+      const lastWord = tokens[tokens.length-1].toUpperCase();
+      if(MONTH_ORDER.includes(lastWord) || state.knownMonths.includes(lastWord)){
+        let subject = tokens.slice(0,-1).join(' ').trim();
+        subject = subject.replace(/\s+ITP$/i,'').trim(); // "TOEFL ITP" -> "TOEFL"
+        if(subject) return {subject, month:lastWord, product:''};
+      }
+    }
+    return null;
+  }
+
+  // Resolves product + month for every stream text of ONE student:
+  //  - product comes from the stream text, falling back to the row's (normalized) product
+  //  - a student who has JUNIOR streams is a JUNIOR student: a stray SMART stream next to them
+  //    (e.g. a SMART subject taken because JUNIOR had too few students) is counted as JUNIOR
+  //  - "TOEFL ITP <month>" streams take product and month of the student's EARLIEST other stream
+  //    (ШІЛДЕ < ТАМЫЗ < ҚЫРКҮЙЕК), because the TOEFL stream name only carries the last extension month.
+  //    A student with only a TOEFL stream keeps the month written in it.
+  function resolveStudentStreams(raws, rowProduct){
+    const items = [];
+    raws.forEach(raw=>{
+      const r = extractStream(raw);
+      if(!r || !r.subject || !r.month) return;
+      items.push({subject:r.subject, month:r.month, product:r.product || rowProduct, toefl:isToeflItp(raw)});
+    });
+    if(items.some(it=>it.product==='JUNIOR')){
+      items.forEach(it=>{ if(it.product==='SMART') it.product = 'JUNIOR'; });
+    }
+    let earliest = null;
+    items.forEach(it=>{
+      if(it.toefl) return;
+      if(!earliest || monthRank(it.month) < monthRank(earliest.month)) earliest = it;
+    });
+    items.forEach(it=>{
+      if(it.toefl && earliest){
+        it.month = earliest.month;
+        it.product = earliest.product;
+      }
+    });
+    // the student's own bucket for the overall report: earliest stream decides (TOEFL only if nothing else);
+    // a student with SMART-PRO (TURBO) streams counts as TURBO
+    const anchorSrc = earliest || items[0] || null;
+    if(!anchorSrc) return {items, anchor:null};
+    const turbo = items.filter(it=>it.product==='TURBO' && !it.toefl).sort((a,b)=>monthRank(a.month)-monthRank(b.month))[0];
+    const anchor = turbo || anchorSrc;
+    return {items, anchor:{product: anchor.product, month: anchor.month}};
+  }
+
+  // The platform lists a student once per product row, so the same person (name + phone) can appear in
+  // two rows with identical streams (JUNIOR/SMART or SMART/TURBO), or with different streams in each.
+  // Rows are merged into ONE student with the unique set of stream texts, so nobody is counted twice.
+  function collectStudents(rows, header, streamRe){
+    const col = re=>header.findIndex(h=>re.test(h));
+    const prodIdx = col(/^продукт$/i);
+    const nameIdx = col(/^студент$/i);
+    const phoneIdx = col(/^номер$/i);
+    const mailIdx = col(/^почта$/i);
+    const idxs = [];
+    header.forEach((h,i)=>{ if(streamRe.test(h)) idxs.push(i); });
+    if(prodIdx<0) throw new Error('«Продукт» бағаны табылмады');
+    if(!idxs.length) throw new Error('Ағын бағандары табылмады');
+    const students = new Map();
+    for(let r=1;r<rows.length;r++){
+      const row = rows[r];
+      const rowProduct = normProduct(row[prodIdx]);
+      if(!rowProduct) continue;
+      const name = nameIdx>=0 ? String(row[nameIdx]||'').toLowerCase().replace(/\s+/g,' ').trim() : '';
+      const contact = (phoneIdx>=0 && String(row[phoneIdx]||'').trim()) || (mailIdx>=0 && String(row[mailIdx]||'').trim().toLowerCase()) || '';
+      const key = (name && contact) ? name+'|'+contact : '#'+r; // no identity -> treat the row as its own student
+      let st = students.get(key);
+      if(!st){ st = {rowProduct, raws:new Set()}; students.set(key, st); }
+      idxs.forEach(ci=>{
+        const raw = String(row[ci]||'').trim();
+        if(raw) st.raws.add(raw);
+      });
+    }
+    return Array.from(students.values()).map(st=>({rowProduct: st.rowProduct, raws: Array.from(st.raws)}));
+  }
+
+  function parseRenewalCounts(workbook){
+    let sheetName = workbook.SheetNames.find(n=>/^оплатили$/i.test(n.trim()));
+    if(!sheetName) sheetName = workbook.SheetNames.find(n=>/оплат/i.test(n) && !/не\s*оплат/i.test(n));
+    if(!sheetName) throw new Error('«Оплатили» атты бет табылмады');
+    const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {header:1, defval:''});
+    if(!rows.length) throw new Error('Бет бос');
+    const header = rows[0].map(h=>String(h).trim());
+    if(!header.some(h=>/^продленн/i.test(h))) throw new Error('«Продленный поток» бағандары табылмады');
+
+    const counts = {}; // group|subject|month -> count
+    const overall = {}; // group|month -> {count,total}: renewed students / renewed + not renewed students
+    const monthsFound = new Set();
+    const groupsFound = new Set();
+    const bump = (g,m,renewed)=>{
+      const k = g+'|'+m;
+      if(!overall[k]) overall[k] = {count:0, total:0};
+      overall[k].total++;
+      if(renewed) overall[k].count++;
+    };
+    collectStudents(rows, header, /^продленн/i).forEach(st=>{
+      const {items, anchor} = resolveStudentStreams(st.raws, st.rowProduct);
+      items.forEach(it=>{
+        monthsFound.add(it.month);
+        groupsFound.add(it.product);
+        const key = it.product+'|'+it.subject+'|'+it.month;
+        counts[key] = (counts[key]||0) + 1;
+      });
+      if(anchor){ groupsFound.add(anchor.product); bump(anchor.product, anchor.month, true); }
+    });
+
+    // "Не оплатили" sheet: the students who did not renew join the denominator (same product/month rules).
+    let hasUnpaid = false;
+    const unpaidCounts = {}; // group|subject|month -> students who did NOT renew that stream
+    const unpaidName = workbook.SheetNames.find(n=>/^не\s*оплатили$/i.test(n.trim()));
+    if(unpaidName){
+      const urows = XLSX.utils.sheet_to_json(workbook.Sheets[unpaidName], {header:1, defval:''});
+      if(urows.length){
+        const uh = urows[0].map(h=>String(h).trim());
+        if(uh.some(h=>/^поток\s*\d*$/i.test(h))){
+          hasUnpaid = true;
+          collectStudents(urows, uh, /^поток\s*\d*$/i).forEach(st=>{
+            const {items, anchor} = resolveStudentStreams(st.raws, st.rowProduct);
+            items.forEach(it=>{
+              const key = it.product+'|'+it.subject+'|'+it.month;
+              unpaidCounts[key] = (unpaidCounts[key]||0) + 1;
+            });
+            if(anchor){ groupsFound.add(anchor.product); monthsFound.add(anchor.month); bump(anchor.product, anchor.month, false); }
+          });
+        }
+      }
+    }
+    return {counts, unpaidCounts, overall: hasUnpaid ? overall : null, monthsFound: Array.from(monthsFound), groupsFound: Array.from(groupsFound)};
+  }
+
+  // Strips the trailing " SMART ШІЛДЕ 11 СЫНЫП 2027"-style tail off a subject string,
+  // using whatever product names the app already knows, for cleaner display in lists.
+  function cleanSubjectLabel(raw){
+    if(!raw) return '';
+    const text = String(raw).trim();
+    for(const g of state.knownGroups){
+      const marker = ' '+g+' ';
+      const idx = text.toUpperCase().indexOf(marker);
+      if(idx>=0) return text.slice(0,idx).trim();
+    }
+    return text;
+  }
+
+  // Finds which known product (SMART/JUNIOR/TURBO/...) is referenced in a piece of text,
+  // whether it's the whole value ("SMART") or embedded in a longer stream string.
+  function extractGroupFromText(raw){
+    if(!raw) return '';
+    const text = String(raw).trim().toUpperCase();
+    if(!text) return '';
+    for(const g of state.knownGroups){
+      if(text === g) return g;
+      if(text.indexOf(' '+g+' ')>=0) return g;
+      if(text.startsWith(g+' ') || text.endsWith(' '+g)) return g;
+    }
+    return '';
+  }
+
+  function parseQolkhatFile(workbook){
+    const sheetName = workbook.SheetNames[0];
+    if(!sheetName) throw new Error('Файлда бет табылмады');
+    const rows = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], {header:1, defval:''});
+    if(!rows.length) throw new Error('Бет бос');
+    const header = rows[0].map(h=>String(h).trim());
+    const idx = {
+      id: header.findIndex(h=>/^id$/i.test(h)),
+      dealName: header.findIndex(h=>/название\s*сделки/i.test(h)),
+      contact: header.findIndex(h=>/основн.*контакт/i.test(h)),
+      stage: header.findIndex(h=>/этап\s*сделки/i.test(h)),
+      name: header.findIndex(h=>/^аты-жөні$/i.test(h)),
+      subject: header.findIndex(h=>/оқып жатырған пәндері/i.test(h)),
+      product: header.findIndex(h=>/^продукт$/i.test(h)),
+    };
+    const list = [];
+    for(let r=1;r<rows.length;r++){
+      const row = rows[r];
+      const name = String((idx.name>=0 && row[idx.name]) || (idx.contact>=0 && row[idx.contact]) || (idx.dealName>=0 && row[idx.dealName]) || '').trim()
+        || (idx.id>=0 && row[idx.id] ? '№'+row[idx.id] : '');
+      const stage = String((idx.stage>=0 && row[idx.stage]) || '').trim();
+      const subjectRaw = idx.subject>=0 ? String(row[idx.subject]||'').trim() : '';
+      const productRaw = idx.product>=0 ? String(row[idx.product]||'').trim() : '';
+      const product = extractGroupFromText(subjectRaw) || extractGroupFromText(productRaw);
+      const subject = cleanSubjectLabel(subjectRaw);
+      if(!name && !stage && !subject && !product) continue; // fully blank row
+      list.push({name: name || '—', stage, subject, product});
+    }
+    return list;
+  }
+
+  // Parses the JUZENG file: one sheet per course/level (e.g. "IELTS TAMYZ", "BEGINNER TAMYZ").
+  // The month is whatever the last word of the sheet name is (kept as-is, own vocabulary).
+  // Renewal rule (per company policy): only an explicit "Жоқ" counts as churned; every other
+  // status (blank, заморозка, қолхат, Енді төлейді, "Иә") counts as staying in the course.
+  function parseJuzengSheetRows(ws){
+    const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+    if(!rows.length) return {total:0, stayed:0, noCount:0, reasons:{}};
+    const header = rows[0].map(h=>String(h||'').trim());
+    const nameIdx = 1; // column B holds the student's name in every sheet of this file
+    const stayIdx = header.findIndex(h=>/қалады/i.test(h));
+    const payMonthsIdx = header.findIndex(h=>/неше айға төледі/i.test(h));
+    const reasonIdx = payMonthsIdx>=0 ? payMonthsIdx+1 : -1;
+    let total=0, noCount=0;
+    const reasons = {};
+    for(let r=1;r<rows.length;r++){
+      const row = rows[r];
+      const name = row[nameIdx];
+      if(!name) continue;
+      total++;
+      const status = String((stayIdx>=0 ? row[stayIdx] : '') || '').trim();
+      if(status === 'Жоқ'){
+        noCount++;
+        if(reasonIdx>=0){
+          const reason = String(row[reasonIdx]||'').trim();
+          if(reason) reasons[reason] = (reasons[reason]||0) + 1;
+        }
+      }
+    }
+    return {total, stayed: total-noCount, noCount, reasons};
+  }
+
+  function parseJuzengFile(workbook){
+    if(!workbook.SheetNames.length) throw new Error('Файлда бет табылмады');
+    const byMonth = {}; // month -> {ielts, levels:{}, reasons:{}}
+    workbook.SheetNames.forEach(sheetName=>{
+      const parts = sheetName.trim().split(/\s+/);
+      if(parts.length<2) return; // can't tell course/month apart — skip safely
+      const month = parts[parts.length-1].toUpperCase();
+      const course = parts.slice(0,-1).join(' ').toUpperCase();
+      const stats = parseJuzengSheetRows(workbook.Sheets[sheetName]);
+      if(!stats.total) return;
+      if(!byMonth[month]) byMonth[month] = {ielts:null, levels:{}, reasons:{}};
+      if(course === 'IELTS'){
+        byMonth[month].ielts = {total:stats.total, stayed:stats.stayed};
+      }else{
+        byMonth[month].levels[course] = {total:stats.total, stayed:stats.stayed};
+        Object.keys(stats.reasons).forEach(k=>{
+          byMonth[month].reasons[k] = (byMonth[month].reasons[k]||0) + stats.reasons[k];
+        });
+      }
+    });
+    return byMonth; // { TAMYZ: {ielts, levels, reasons}, ... }
+  }
+
+  // ---------- rendering ----------
+  function subjectsForTotals(totals, counts, month){
+    if(month === ALL_MONTHS){
+      const pairs = new Set(); // group|subject
+      Object.keys(totals||{}).forEach(k=>{ const p=k.split('|'); pairs.add(p[0]+'|'+p[1]); });
+      Object.keys(counts||{}).forEach(k=>{ const p=k.split('|'); pairs.add(p[0]+'|'+p[1]); });
+      return Array.from(pairs).map(gs=>{
+        const [group, subject] = gs.split('|');
+        let count=0, total=0, anyTotal=false;
+        state.knownMonths.forEach(m=>{
+          const k = gs+'|'+m;
+          const t = totals && totals[k];
+          // only include a month in the combined figure once it has a configured total —
+          // otherwise its count would inflate the numerator with nothing to balance it in the denominator
+          if(t){
+            total += t;
+            count += (counts && counts[k]) || 0;
+            anyTotal = true;
+          }
+        });
+        const finalTotal = anyTotal ? total : null;
+        const pct = fmtPct(count, finalTotal);
+        return {key: gs+'|'+ALL_MONTHS, group, subject, count, total: finalTotal, pct};
+      });
+    }
+    const suffix = '|'+month;
+    const keys = new Set();
+    Object.keys(totals||{}).forEach(k=>{ if(k.endsWith(suffix)) keys.add(k); });
+    Object.keys(counts||{}).forEach(k=>{ if(k.endsWith(suffix)) keys.add(k); });
+    return Array.from(keys).map(k=>{
+      const parts = k.split('|');
+      const group = parts[0], subject = parts[1];
+      const count = (counts && counts[k]) || 0;
+      const total = (totals && totals[k]) || null;
+      const pct = fmtPct(count, total);
+      return {key:k, group, subject, count, total, pct};
+    });
+  }
+
+  function deltaFor(key){
+    if(!state.prevCounts) return null;
+    if(state.activeMonth === ALL_MONTHS){
+      const parts = key.split('|'); // group|subject|__ALL__
+      const gs = parts[0]+'|'+parts[1];
+      let cur=0, prev=0, any=false;
+      state.knownMonths.forEach(m=>{
+        const k = gs+'|'+m;
+        if(state.counts && state.counts[k]!==undefined){ cur+=state.counts[k]; any=true; }
+        if(state.prevCounts && state.prevCounts[k]!==undefined){ prev+=state.prevCounts[k]; any=true; }
+      });
+      return any ? cur-prev : null;
+    }
+    const prev = state.prevCounts[key];
+    if(prev===undefined) return null;
+    const cur = (state.counts && state.counts[key]) || 0;
+    return cur - prev;
+  }
+
+  function renderBanner(items){
+    const box = $('#banner');
+    box.innerHTML = '';
+    if(!state.isAdmin) return;
+    const missing = items.filter(i=>!i.total);
+    if(!missing.length) return;
+    const b = el('div','banner');
+    b.innerHTML = '<span>'+ic('alert')+' <b>'+missing.length+'</b> пәнге жалпы оқушы саны әлі белгіленбеген — пайыз есептелмейді.</span>';
+    const btn = el('button','btn','Баптау');
+    btn.onclick = ()=>{ $('#settingsPanel').classList.add('open'); $('#settingsPanel').scrollIntoView({behavior:'smooth', block:'start'}); };
+    b.appendChild(btn);
+    box.appendChild(b);
+  }
+
+  function renderOverall(){
+    const wrap = el('div');
+    const raw = state.overall || {};
+    // backward-compat: earlier version stored a flat {smart:{...}, junior:{...}} for ШІЛДЕ only
+    const migrated = Object.assign({}, raw);
+    if(raw.smart && !migrated['SMART|ШІЛДЕ']) migrated['SMART|ШІЛДЕ'] = raw.smart;
+    if(raw.junior && !migrated['JUNIOR|ШІЛДЕ']) migrated['JUNIOR|ШІЛДЕ'] = raw.junior;
+    delete migrated.smart; delete migrated.junior;
+    // fixed «жалпы» win over whatever was saved for the date (also fixes already-uploaded days)
+    Object.keys(OVERALL_TOTALS).forEach(k=>{
+      if(migrated[k]) migrated[k] = {count: migrated[k].count||0, total: OVERALL_TOTALS[k]};
+    });
+
+    const isAll = state.activeMonth === ALL_MONTHS;
+    const groupData = state.knownGroups.map(g=>{
+      if(isAll){
+        let count=0, total=0, has=false;
+        state.knownMonths.forEach(m=>{
+          const k = g+'|'+m;
+          if(migrated[k]){ count += migrated[k].count||0; total += migrated[k].total||0; has = true; }
+        });
+        return {group:g, key:null, d:{count,total}, has};
+      }
+      const key = g+'|'+state.activeMonth;
+      return {group:g, key, d: migrated[key] || {count:0,total:0}, has: !!migrated[key]};
+    });
+    const hasData = groupData.some(gd=>gd.has);
+    if(!hasData && !state.isAdmin) return wrap; // nothing to show a viewer yet for this stream
+
+    const totalCount = groupData.reduce((s,gd)=>s+(gd.d.count||0),0);
+    const totalTotal = groupData.reduce((s,gd)=>s+(gd.d.total||0),0);
+
+    const hintText = isAll ? 'Барлық кезеңдер қосылған жалпы көрсеткіш' : (state.activeMonth+' ағымы бойынша жалпы көрсеткіш');
+    wrap.innerHTML = `<div class="section-head" style="margin-top:0;"><h2>Ұзарту отчеты</h2><div class="hint">${hintText}</div></div>`;
+    const row = el('div','overall-row');
+    row.style.setProperty('--n', Math.max(1, Math.min(4, groupData.length)));
+
+    groupData.forEach(gd=>{
+      const pct = fmtPct(gd.d.count, gd.d.total);
+      const card = el('div','overall-card');
+      card.style.position = 'relative';
+      card.style.setProperty('--c', groupColor(gd.group));
+      card.style.setProperty('--p', pct===null?0:Math.min(100,pct).toFixed(2));
+      card.innerHTML = `
+        <div class="oc-head">
+          <div class="tag" style="color:${groupColor(gd.group)}">${groupLabel(gd.group)}</div>
+          <div class="oc-right"><span class="oc-month">${monthLabel(state.activeMonth)}</span></div>
+        </div>
+        <div class="pct" data-pct="${pct===null?'':pct}" style="color:${pctColor(pct)}">${pctStr(pct)}</div>
+        <div class="oc-bar"><i style="width:${pct===null?0:Math.min(100,pct).toFixed(2)}%"></i></div>
+        <div class="frac mono"><span><b>${gd.d.count||0}</b> / ${gd.d.total||0}</span></div>
+      `;
+      if(state.isAdmin){
+        const delBtn = el('button','del-btn');
+        delBtn.type = 'button';
+        delBtn.title = 'Продуктты жою';
+        delBtn.innerHTML = ic('trash');
+        let confirmTimer;
+        delBtn.addEventListener('click', async (e)=>{
+          e.stopPropagation();
+          if(!delBtn.classList.contains('confirming')){
+            delBtn.classList.add('confirming');
+            delBtn.textContent = 'Растау';
+            confirmTimer = setTimeout(()=>{
+              delBtn.classList.remove('confirming');
+              delBtn.innerHTML = ic('trash');
+            }, 3000);
+            return;
+          }
+          clearTimeout(confirmTimer);
+          state.knownGroups = state.knownGroups.filter(x=>x!==gd.group);
+          await saveGroups(state.knownGroups);
+          if(state.activeTab === gd.group) state.activeTab = state.knownGroups[0];
+          renderAll();
+        });
+        card.querySelector('.oc-right').appendChild(delBtn);
+      }
+      if(state.isAdmin && !isAll){
+        const editRow = el('div','overall-edit');
+        editRow.innerHTML = `
+          <input type="number" min="0" value="${gd.d.count||''}" placeholder="саны">
+          <span>/</span>
+          <input type="number" min="0" value="${gd.d.total||''}" placeholder="жалпы">
+        `;
+        const inputs = editRow.querySelectorAll('input');
+        let timer;
+        inputs.forEach(inp=>{
+          inp.addEventListener('input', ()=>{
+            clearTimeout(timer);
+            timer = setTimeout(async ()=>{
+              const cVal = parseInt(inputs[0].value,10)||0;
+              const tVal = parseInt(inputs[1].value,10)||0;
+              state.overall = migrated;
+              state.overall[gd.key] = {count:cVal, total:tVal};
+              if(!state.viewingDate) return;
+              await saveOverallData(state.viewingDate, state.overall);
+              renderAll();
+            }, 500);
+          });
+        });
+        card.appendChild(editRow);
+      }
+      row.appendChild(card);
+    });
+
+    const totalPct = fmtPct(totalCount, totalTotal);
+    const totalCard = el('div','overall-card total');
+    totalCard.style.setProperty('--p', totalPct===null?0:Math.min(100,totalPct).toFixed(2));
+    totalCard.innerHTML = `
+      <div class="oc-head">
+        <div class="tag">ЖАЛПЫ</div>
+        <div class="oc-right"><span class="oc-month">${monthLabel(state.activeMonth)}</span></div>
+      </div>
+      <div class="pct" data-pct="${totalPct===null?'':totalPct}">${pctStr(totalPct)}</div>
+      <div class="oc-bar"><i style="width:${totalPct===null?0:Math.min(100,totalPct).toFixed(2)}%"></i></div>
+      <div class="frac mono"><span><b>${totalCount}</b> / ${totalTotal}</span></div>
+    `;
+    row.appendChild(totalCard);
+
+    wrap.appendChild(row);
+    return wrap;
+  }
+
+  function renderTop3(items){
+    const ranked = items.filter(i=>i.pct!==null).sort((a,b)=>b.pct-a.pct).slice(0,3);
+    const section = el('div');
+    section.innerHTML = `<div class="section-head"><h2>Топ-3 пән</h2><div class="hint">Ұзарту пайызы ең жоғары пәндер</div></div>`;
+    const grid = el('div','top3');
+    const ranks = ['r1','r2','r3'];
+    if(!ranked.length){
+      grid.appendChild(el('div','hint','Деректер жеткіліксіз'));
+    }
+    ranked.forEach((item,i)=>{
+      const card = el('div','rank-card '+ranks[i]);
+      const d = deltaFor(item.key);
+      let deltaHtml = '';
+      if(d!==null){
+        const cls = d>0?'up':(d<0?'down':'flat');
+        const sign = d>0?'+':'';
+        deltaHtml = `<span class="delta ${cls}">${sign}${d}</span>`;
+      }
+      card.innerHTML = `
+        <div class="rank-badge">${i+1}</div>
+        <div class="rank-group" style="color:${groupColor(item.group)}">${groupLabel(item.group)}</div>
+        <div class="rank-subject">${item.subject}</div>
+        <div class="rank-pct" data-pct="${item.pct}" style="color:${pctColor(item.pct)}">${pctStr(item.pct)}</div>
+        <div class="rank-meta">
+          <span class="rank-count mono">${item.count} / ${item.total}</span>
+          ${deltaHtml}
+        </div>`;
+      grid.appendChild(card);
+    });
+    section.appendChild(grid);
+    return section;
+  }
+
+  function renderTabsAndList(items){
+    const wrap = el('div');
+    wrap.innerHTML = `<div class="section-head"><h2>Барлық пәндер</h2></div>`;
+    if(!state.knownGroups.includes(state.activeTab)) state.activeTab = state.knownGroups[0];
+    const tabs = el('div','tabs');
+    state.knownGroups.forEach(g=>{
+      const isActive = g===state.activeTab;
+      const t = el('button','tab'+(isActive?' active':''), groupLabel(g));
+      if(isActive) t.style.color = groupColor(g);
+      t.onclick = ()=>{ state.activeTab = g; renderAll(); };
+      tabs.appendChild(t);
+    });
+    wrap.appendChild(tabs);
+
+    const list = el('div','subject-list');
+    const rows = items.filter(i=>i.group===state.activeTab).sort((a,b)=>{
+      if(a.pct===null && b.pct===null) return b.count-a.count;
+      if(a.pct===null) return 1;
+      if(b.pct===null) return -1;
+      return b.pct-a.pct;
+    });
+    rows.forEach((item,i)=>{
+      const row = el('div','subject-row');
+      const barWidth = item.pct!==null ? Math.min(100, Math.max(item.pct>0?1.5:0, item.pct)) : 0;
+      const d = deltaFor(item.key);
+      let deltaHtml = '';
+      if(d!==null){
+        const cls = d>0?'up':(d<0?'down':'flat');
+        const sign = d>0?'+':'';
+        deltaHtml = `<span class="delta ${cls}" style="margin-left:6px;">${sign}${d}</span>`;
+      }
+      row.innerHTML = `
+        <div class="s-rank mono">${i+1}</div>
+        <div class="s-name">${item.subject}${item.total?'':'<span class="needs">Жалпы саны белгіленбеген</span>'}</div>
+        <div class="bar-track"><div class="bar-fill" style="width:${barWidth}%;background:${pctColor(item.pct)}"></div></div>
+        <div class="s-count mono">${item.count} / ${item.total||'—'}</div>
+        <div class="s-pct mono" style="color:${pctColor(item.pct)}">${pctStr(item.pct)}${deltaHtml}</div>
+      `;
+      list.appendChild(row);
+    });
+    if(!rows.length){
+      list.appendChild(el('div','subject-row','<div class="s-name" style="grid-column:1/-1;color:var(--text-faint)">Бұл топ бойынша деректер жоқ</div>'));
+    }
+    wrap.appendChild(list);
+    return wrap;
+  }
+
+  function renderPanel(items){
+    const body = $('#panelBody');
+    body.innerHTML = '';
+    if(state.activeMonth === ALL_MONTHS){
+      body.innerHTML = '<div class="hint">Жалпы санды баптау үшін жоғарыдан нақты бір кезеңді (мыс. ШІЛДЕ) таңдаңыз — «Барлығы» режимінде сандар барлық кезеңдерден автоматты қосылады, бөлек баптауды қажет етпейді.</div>';
+      return;
+    }
+    const legend = el('div','panel-row');
+    legend.innerHTML = `<span></span><span class="hint" style="text-align:right;">оқушы</span><span></span><span class="hint" style="text-align:right;">жалпы</span><span></span><span></span>`;
+    legend.style.borderBottom = 'none';
+    legend.style.paddingBottom = '0';
+    body.appendChild(legend);
+    state.knownGroups.forEach(g=>{
+      const subs = items.filter(i=>i.group===g).sort((a,b)=>a.subject.localeCompare(b.subject,'kk'));
+      if(!subs.length) return;
+      body.appendChild(el('div','panel-group-title', groupLabel(g)));
+      subs.forEach(item=>{
+        const row = el('div','panel-row');
+        const safeKey = item.key.replace(/[^a-zA-Zа-яА-ЯёЁәғқңөұүһі0-9]/gu,'_');
+        const countId = 'cnt_'+safeKey;
+        const totalId = 'tot_'+safeKey;
+        row.innerHTML = `
+          <label for="${totalId}">${item.subject}</label>
+          <input type="number" min="0" id="${countId}" value="${item.count||0}">
+          <span class="sep">/</span>
+          <input type="number" min="0" id="${totalId}" value="${item.total||''}" placeholder="мысалы: 1000">
+          <span class="save-tick" id="tick_${safeKey}">${ic('check')}сақталды</span>
+          <button type="button" class="del-btn" title="Пәнді өшіру">${ic('trash')}</button>
+        `;
+        const showTick = ()=>{
+          const tick = $('#tick_'+safeKey);
+          if(tick){ tick.classList.add('show'); setTimeout(()=>tick.classList.remove('show'),1400); }
+        };
+
+        const inputs = row.querySelectorAll('input');
+        const countInput = inputs[0], totalInput = inputs[1];
+        let totalTimer;
+        totalInput.addEventListener('input', ()=>{
+          clearTimeout(totalTimer);
+          totalTimer = setTimeout(async ()=>{
+            const val = parseInt(totalInput.value,10);
+            if(!val || val<=0 || !state.viewingDate) return;
+            state.totals[item.key] = val;
+            const ok = await saveSnapshot(state.viewingDate, {counts: state.counts, totals: state.totals, savedAt: new Date().toISOString()});
+            if(ok) showTick();
+            renderAll();
+          }, 500);
+        });
+
+        let countTimer;
+        countInput.addEventListener('input', ()=>{
+          clearTimeout(countTimer);
+          countTimer = setTimeout(async ()=>{
+            const val = parseInt(countInput.value,10);
+            if(isNaN(val) || val<0 || !state.viewingDate) return;
+            state.counts = state.counts || {};
+            state.counts[item.key] = val;
+            const ok = await saveSnapshot(state.viewingDate, {counts: state.counts, totals: state.totals, savedAt: new Date().toISOString()});
+            if(ok) showTick();
+            renderAll();
+          }, 500);
+        });
+
+        const delBtn = row.querySelector('.del-btn');
+        let confirmTimer;
+        delBtn.addEventListener('click', async ()=>{
+          if(!delBtn.classList.contains('confirming')){
+            delBtn.classList.add('confirming');
+            delBtn.textContent = 'Растау';
+            confirmTimer = setTimeout(()=>{
+              delBtn.classList.remove('confirming');
+              delBtn.innerHTML = ic('trash');
+            }, 3000);
+            return;
+          }
+          clearTimeout(confirmTimer);
+          delete state.totals[item.key];
+          if(state.counts && state.viewingDate){
+            delete state.counts[item.key];
+          }
+          if(state.viewingDate){
+            await saveSnapshot(state.viewingDate, {counts: state.counts, totals: state.totals, savedAt: new Date().toISOString()});
+          }
+          renderAll();
+        });
+
+        body.appendChild(row);
+      });
+    });
+  }
+
+  function renderCopyTotalsPanel(){
+    const box = $('#copyTotalsPanel');
+    if(!box) return;
+    if(!state.dates.length){
+      box.innerHTML = '<div class="hint">Әзірге жүктелген күн жоқ.</div>';
+      return;
+    }
+    const sorted = [...state.dates].sort();
+    const dateOpts = (selected)=> sorted.map(d=>`<option value="${d}" ${d===selected?'selected':''}>${fmtDateShort(d)}${d===latestDate()?' · соңғы':''}</option>`).join('');
+    box.innerHTML = `
+      <div class="hint" style="margin-bottom:10px;">Жоғарыдағы «жалпы» өрістеріне дұрыс сандарды теріп/тексеріп алыңыз — сол қазіргі сандар осы таңдалған аралыққа қолданылады.</div>
+      <div class="copy-totals-row" style="grid-template-columns:1fr 1fr auto;">
+        <div>
+          <label for="copyFrom">Бастап</label>
+          <select id="copyFrom">${dateOpts(sorted[0])}</select>
+        </div>
+        <div>
+          <label for="copyTo">Дейін</label>
+          <select id="copyTo">${dateOpts(sorted[sorted.length-1])}</select>
+        </div>
+        <button type="button" class="btn primary" id="copyTotalsBtn">Қолдану</button>
+      </div>
+      <div id="copyTotalsStatus" class="hint" style="margin-top:10px;"></div>
+    `;
+    $('#copyTotalsBtn').addEventListener('click', async ()=>{
+      const from = $('#copyFrom').value;
+      const to = $('#copyTo').value;
+      const status = $('#copyTotalsStatus');
+      if(from > to){ status.textContent = '«Бастап» күні «Дейін» күнінен кеш болмауы керек.'; return; }
+      const targetDates = sorted.filter(d=>d>=from && d<=to);
+      let done = 0;
+      status.textContent = 'Қолданылуда… (0/'+targetDates.length+')';
+      for(const d of targetDates){
+        const snap = await loadSnapshot(d);
+        if(!snap) continue;
+        await saveSnapshot(d, {counts: snap.counts, totals: {...state.totals}, savedAt: snap.savedAt || new Date().toISOString()});
+        done++;
+        status.textContent = 'Қолданылуда… ('+done+'/'+targetDates.length+')';
+      }
+      status.innerHTML = ic('check')+' Дайын: '+done+' күнге көшірілді.';
+      if(targetDates.includes(state.viewingDate)){
+        await showDate(state.viewingDate);
+      }
+    });
+  }
+
+  function renderPeriodSelector(){
+    const box = $('#periodRow');
+    const opts = [ALL_MONTHS, ...state.knownMonths]
+      .map(m=>`<option value="${m}" ${m===state.activeMonth?'selected':''}>${monthLabel(m)}</option>`)
+      .join('');
+    let html = `<label for="periodSelect">Кезең:</label><select class="period-select" id="periodSelect">${opts}</select>`;
+    if(state.isAdmin){
+      html += `
+        <div class="period-manage-wrap">
+          <button type="button" class="btn icon" id="periodManageBtn" title="Кезеңдерді басқару" style="padding:6px 8px;font-size:12px;">${ic('pencil')}</button>
+          <div class="period-manage-panel" id="periodManagePanel"></div>
+        </div>
+      `;
+    }
+    box.innerHTML = html;
+    $('#periodSelect').addEventListener('change', (e)=>{
+      state.activeMonth = e.target.value;
+      saveLocalMonth(state.activeMonth);
+      renderAll();
+    });
+    if(state.isAdmin){
+      $('#periodManageBtn').addEventListener('click', (e)=>{
+        e.stopPropagation();
+        const panel = $('#periodManagePanel');
+        const willOpen = !panel.classList.contains('open');
+        panel.classList.toggle('open', willOpen);
+        if(willOpen) renderPeriodManagePanel();
+      });
+    }
+  }
+
+  function renderPeriodManagePanel(){
+    const panel = $('#periodManagePanel');
+    if(!panel) return;
+    if(!state.knownMonths.length){
+      panel.innerHTML = '<div class="hint" style="padding:6px 4px;">Кезеңдер жоқ</div>';
+      return;
+    }
+    panel.innerHTML = '';
+    state.knownMonths.forEach(m=>{
+      const row = el('div','period-manage-row');
+      const label = el('span','', m);
+      row.appendChild(label);
+      const delBtn = el('button','del-btn');
+      delBtn.type = 'button';
+      delBtn.title = 'Кезеңді жою';
+      delBtn.innerHTML = ic('trash');
+      let confirmTimer;
+      delBtn.addEventListener('click', async (e)=>{
+        e.stopPropagation();
+        if(!delBtn.classList.contains('confirming')){
+          delBtn.classList.add('confirming');
+          delBtn.textContent = 'Растау';
+          confirmTimer = setTimeout(()=>{
+            delBtn.classList.remove('confirming');
+            delBtn.innerHTML = ic('trash');
+          }, 3000);
+          return;
+        }
+        clearTimeout(confirmTimer);
+        state.knownMonths = state.knownMonths.filter(x=>x!==m);
+        await savePeriod({known: state.knownMonths});
+        if(state.activeMonth === m){
+          state.activeMonth = state.knownMonths.length ? state.knownMonths[state.knownMonths.length-1] : ALL_MONTHS;
+          saveLocalMonth(state.activeMonth);
+        }
+        renderPeriodSelector();
+        renderAll();
+      });
+      row.appendChild(delBtn);
+      panel.appendChild(row);
+    });
+  }
+
+  function renderFooter(){
+    $('#footerNote').innerHTML = '';
+  }
+
+  function renderQolkhat(){
+    const box = $('#qolkhatContent');
+    $('#qolkhatBadge').textContent = state.qolkhatList.length ? String(state.qolkhatList.length) : '';
+
+    if(!state.qolkhatList.length){
+      const msg = state.isAdmin
+        ? 'Қолхат тізімі бар Excel файлын (amoCRM экспорты) жоғарыдағы түйме арқылы жүктеңіз.'
+        : 'Әкімші файлды жүктегенше күте тұрыңыз.';
+      box.innerHTML = `<div class="empty"><div class="display">Әзірге дерек жоқ</div><p>${msg}</p></div>`;
+      return;
+    }
+
+    if(!$('#qolkhatSearchInput')){
+      const productsPresent = Array.from(new Set(state.qolkhatList.map(p=>p.product).filter(Boolean)));
+      const pillGroups = Array.from(new Set([...state.knownGroups, ...productsPresent]));
+      const pills = ['<button class="qk-pill active" data-product="">Барлығы</button>']
+        .concat(pillGroups.map(g=>`<button class="qk-pill" data-product="${escapeAttr(g)}" style="border-color:${groupColor(g)}">${groupLabel(g)}</button>`))
+        .join('');
+      box.innerHTML = `
+        <div class="qolkhat-stat" id="qolkhatStat"></div>
+        <div class="qolkhat-toolbar">
+          <input type="text" class="qolkhat-search" id="qolkhatSearchInput" placeholder="Аты-жөні немесе пән бойынша іздеу…">
+          <div class="qk-filter-pills" id="qkFilterPills">${pills}</div>
+        </div>
+        <div class="qolkhat-list" id="qolkhatListBox"></div>
+      `;
+      $('#qolkhatSearchInput').addEventListener('input', (e)=>{
+        state.qolkhatFilter = e.target.value;
+        renderQolkhatStat();
+        renderQolkhatList();
+      });
+      $('#qkFilterPills').querySelectorAll('.qk-pill').forEach(btn=>{
+        btn.addEventListener('click', ()=>{
+          state.qolkhatProductFilter = btn.dataset.product;
+          $('#qkFilterPills').querySelectorAll('.qk-pill').forEach(b=>b.classList.toggle('active', b===btn));
+          renderQolkhatStat();
+          renderQolkhatList();
+        });
+      });
+    }
+    $('#qolkhatSearchInput').value = state.qolkhatFilter;
+    renderQolkhatStat();
+    renderQolkhatList();
+  }
+
+  function getFilteredQolkhat(){
+    const filter = state.qolkhatFilter.trim().toLowerCase();
+    const productFilter = state.qolkhatProductFilter;
+    return state.qolkhatList.map((p,i)=>({p,i})).filter(({p})=>{
+      if(productFilter && p.product!==productFilter) return false;
+      if(filter && !(p.name+' '+p.subject+' '+p.stage).toLowerCase().includes(filter)) return false;
+      return true;
+    });
+  }
+
+  function renderQolkhatStat(){
+    const statBox = $('#qolkhatStat');
+    if(!statBox) return;
+    const total = state.qolkhatList.length;
+    const productsPresent = Array.from(new Set(state.qolkhatList.map(p=>p.product).filter(Boolean)));
+    const allGroups = Array.from(new Set([...state.knownGroups, ...productsPresent]));
+    const noProductCount = state.qolkhatList.filter(p=>!p.product).length;
+
+    const cards = [`<div class="qk-stat-card"><div class="qk-stat-num mono">${total}</div><div class="qk-stat-lbl">Барлығы</div></div>`];
+    allGroups.forEach(g=>{
+      const n = state.qolkhatList.filter(p=>p.product===g).length;
+      cards.push(`<div class="qk-stat-card" style="border-top:3px solid ${groupColor(g)}"><div class="qk-stat-num mono" style="color:${groupColor(g)}">${n}</div><div class="qk-stat-lbl">${groupLabel(g)}</div></div>`);
+    });
+    if(noProductCount>0){
+      cards.push(`<div class="qk-stat-card"><div class="qk-stat-num mono" style="color:var(--text-faint)">${noProductCount}</div><div class="qk-stat-lbl">Белгісіз</div></div>`);
+    }
+
+    let html = `<div class="qk-stat-row">${cards.join('')}</div>`;
+    const isFiltered = !!(state.qolkhatFilter.trim() || state.qolkhatProductFilter);
+    if(isFiltered){
+      const filteredCount = getFilteredQolkhat().length;
+      html += `<div style="color:var(--text-dim);font-size:13px;margin-top:10px;">Сүзгі бойынша көрсетіліп тұр: <b style="color:var(--text)">${filteredCount}</b></div>`;
+    }
+    if(state.qolkhatUpdatedAt){
+      const d = new Date(state.qolkhatUpdatedAt);
+      const dateStr = d.toLocaleDateString('kk-KZ',{day:'2-digit',month:'2-digit',year:'numeric'});
+      const timeStr = d.toLocaleTimeString('kk-KZ',{hour:'2-digit',minute:'2-digit'});
+      html += `<div style="color:var(--text-faint);font-size:12px;margin-top:6px;">соңғы жаңарту: ${dateStr} ${timeStr}</div>`;
+    }
+    statBox.innerHTML = html;
+  }
+
+  function escapeAttr(s){
+    return String(s==null?'':s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+  }
+
+  async function persistQolkhatList(){
+    await saveQolkhat({list: state.qolkhatList, uploadedAt: state.qolkhatUpdatedAt});
+  }
+
+  function renderQolkhatList(){
+    const listBox = $('#qolkhatListBox');
+    if(!listBox) return;
+    const rows = getFilteredQolkhat();
+    listBox.innerHTML = '';
+    if(!rows.length){
+      listBox.innerHTML = '<div class="qolkhat-row" style="grid-template-columns:1fr;color:var(--text-faint);">Ештеңе табылмады</div>';
+      return;
+    }
+    rows.forEach(({p, i})=>{
+      const row = el('div', state.isAdmin ? 'qolkhat-row qolkhat-row-edit' : 'qolkhat-row');
+      if(state.isAdmin){
+        row.innerHTML = `
+          <input type="text" class="qk-edit" data-field="name" value="${escapeAttr(p.name)}" placeholder="Аты-жөні">
+          <input type="text" class="qk-edit" data-field="product" value="${escapeAttr(p.product)}" placeholder="Продукт">
+          <input type="text" class="qk-edit" data-field="stage" value="${escapeAttr(p.stage)}" placeholder="Этап">
+          <input type="text" class="qk-edit" data-field="subject" value="${escapeAttr(p.subject)}" placeholder="Пән">
+          <button type="button" class="del-btn" title="Тізімнен өшіру">${ic('trash')}</button>
+        `;
+        const inputs = row.querySelectorAll('input');
+        let saveTimer;
+        inputs.forEach(inp=>{
+          inp.addEventListener('input', ()=>{
+            clearTimeout(saveTimer);
+            saveTimer = setTimeout(async ()=>{
+              state.qolkhatList[i][inp.dataset.field] = inp.value;
+              await persistQolkhatList();
+            }, 600);
+          });
+        });
+        const delBtn = row.querySelector('.del-btn');
+        let confirmTimer;
+        delBtn.addEventListener('click', async ()=>{
+          if(!delBtn.classList.contains('confirming')){
+            delBtn.classList.add('confirming');
+            delBtn.textContent = 'Растау';
+            confirmTimer = setTimeout(()=>{
+              delBtn.classList.remove('confirming');
+              delBtn.innerHTML = ic('trash');
+            }, 3000);
+            return;
+          }
+          clearTimeout(confirmTimer);
+          state.qolkhatList.splice(i,1);
+          await persistQolkhatList();
+          renderQolkhat();
+        });
+      }else{
+        const productBadge = p.product
+          ? `<div class="qolkhat-product" style="color:${groupColor(p.product)};background:var(--surface-3);border:1px solid ${groupColor(p.product)}">${groupLabel(p.product)}</div>`
+          : `<div class="qolkhat-product" style="color:var(--text-faint);background:var(--surface-2)">—</div>`;
+        row.innerHTML = `
+          <div class="qolkhat-name">${p.name}</div>
+          ${productBadge}
+          <div class="qolkhat-stage">${p.stage||'—'}</div>
+          <div class="qolkhat-subject">${p.subject||'—'}</div>
+        `;
+      }
+      listBox.appendChild(row);
+    });
+  }
+
+  function renderJuzengPeriodSelector(){
+    const box = $('#juzengPeriodRow');
+    if(!state.juzengMonths.length){ box.innerHTML=''; return; }
+    const opts = state.juzengMonths.map(m=>`<option value="${m}" ${m===state.juzengActiveMonth?'selected':''}>${m}</option>`).join('');
+    box.innerHTML = `<label for="juzengPeriodSelect">Кезең:</label><select class="period-select" id="juzengPeriodSelect">${opts}</select>`;
+    $('#juzengPeriodSelect').addEventListener('change', async (e)=>{
+      state.juzengActiveMonth = e.target.value;
+      state.juzengData = await loadJuzengSnapshot(state.juzengActiveMonth);
+      renderJuzeng();
+    });
+  }
+
+  function juzengPct(d){ return d ? fmtPct(d.stayed, d.total) : null; }
+
+  function renderJuzeng(){
+    const box = $('#juzengContent');
+    if(!state.juzengData){
+      const msg = state.isAdmin
+        ? 'IELTS Excel файлын (IELTS/BEGINNER/ELEM/PRE-INTER беттерімен) жоғарыдағы түйме арқылы жүктеңіз.'
+        : 'Әкімші файлды жүктегенше күте тұрыңыз.';
+      box.innerHTML = `<div class="empty"><div class="display">Әзірге дерек жоқ</div><p>${msg}</p></div>`;
+      return;
+    }
+    const d = state.juzengData;
+    const levelKeys = Object.keys(d.levels||{});
+    const genTotal = levelKeys.reduce((s,k)=>s+d.levels[k].total,0);
+    const genStayed = levelKeys.reduce((s,k)=>s+d.levels[k].stayed,0);
+    const ielts = d.ielts || {total:0, stayed:0};
+    const allTotal = ielts.total + genTotal;
+    const allStayed = ielts.stayed + genStayed;
+
+    let html = `<div class="section-head" style="margin-top:0;"><h2>IELTS — ${state.juzengActiveMonth||''}</h2><div class="hint">IELTS және General курстарының ұзарту көрсеткіші</div></div>`;
+    html += `<div class="overall-row" style="margin-bottom:30px;--n:2;">`;
+    const cards = [
+      {label:'IELTS', d: ielts},
+      {label:'General', d: {total:genTotal, stayed:genStayed}},
+      {label:'Барлығы', d: {total:allTotal, stayed:allStayed}},
+    ];
+    const cardColors = ['var(--sky)','var(--gold)','var(--mint)'];
+    cards.forEach((c,ci)=>{
+      const pct = juzengPct(c.d);
+      const w = pct===null ? 0 : Math.min(100,pct).toFixed(2);
+      html += `
+        <div class="overall-card${ci===2?' total':''}" style="--c:${cardColors[ci]}">
+          <div class="oc-head">
+            <div class="tag" style="color:${cardColors[ci]}">${c.label}</div>
+            <div class="oc-right"><span class="oc-month">${state.juzengActiveMonth||''}</span></div>
+          </div>
+          <div class="pct" data-pct="${pct===null?'':pct}" style="color:${pctColor(pct)}">${pctStr(pct)}</div>
+          <div class="oc-bar"><i style="width:${w}%"></i></div>
+          <div class="frac mono"><span><b>${c.d.stayed}</b> / ${c.d.total}</span></div>
+        </div>`;
+    });
+    html += `</div>`;
+
+    html += `<div class="section-head"><h2>Деңгейлер бойынша (General)</h2></div>`;
+    html += `<div class="subject-list">`;
+    levelKeys.sort((a,b)=> (juzengPct(d.levels[b])||0) - (juzengPct(d.levels[a])||0)).forEach((k,i)=>{
+      const ld = d.levels[k];
+      const pct = juzengPct(ld);
+      const barWidth = pct!==null ? Math.min(100, Math.max(1.5,pct)) : 0;
+      html += `
+        <div class="subject-row">
+          <div class="s-rank mono">${i+1}</div>
+          <div class="s-name">${k}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${barWidth}%;background:${pctColor(pct)}"></div></div>
+          <div class="s-count mono">${ld.stayed} / ${ld.total}</div>
+          <div class="s-pct mono" style="color:${pctColor(pct)}">${pctStr(pct)}</div>
+        </div>`;
+    });
+    html += `</div>`;
+
+    const reasonEntries = Object.entries(d.reasons||{}).sort((a,b)=>b[1]-a[1]).slice(0,12);
+    if(reasonEntries.length){
+      html += `<div class="section-head"><h2>Кету себептері</h2><div class="hint">«Жоқ» жауап берген оқушылардың себептері (топ ${reasonEntries.length})</div></div>`;
+      html += `<div class="reason-badges">`;
+      reasonEntries.forEach(([reason,count])=>{
+        html += `<span class="reason-badge">${reason} · <b>${count}</b></span>`;
+      });
+      html += `</div>`;
+    }
+
+    box.innerHTML = html;
+  }
+
+  function fmtDateShort(dateStr){
+    const d = new Date(dateStr+'T00:00:00');
+    return d.toLocaleDateString('kk-KZ',{day:'2-digit',month:'2-digit'});
+  }
+
+  function renderDateSelector(){
+    const box = $('#dateRow');
+    if(!state.dates.length){
+      box.innerHTML = '';
+      return;
+    }
+    const ordered = [...state.dates].sort().reverse();
+    const opts = ordered.map(d=>{
+      const isLatest = d===latestDate();
+      return `<option value="${d}" ${d===state.viewingDate?'selected':''}>${fmtDateShort(d)}${isLatest?' · соңғы':''}</option>`;
+    }).join('');
+    box.innerHTML = `<label for="dateSelect">Күн:</label><select class="period-select" id="dateSelect">${opts}</select>`;
+    $('#dateSelect').addEventListener('change', (e)=>{ showDate(e.target.value); });
+  }
+
+  // Entrance animation + count-up. Runs only when the viewed date/period/tab changes, so editing a
+  // number in the admin panel doesn't replay the whole choreography.
+  let lastViewSig = '';
+  function polishUI(){
+    const root = $('#mainContent');
+    const sig = [state.viewingDate, state.activeMonth, state.activeTab].join('|');
+    const fresh = sig !== lastViewSig;
+    lastViewSig = sig;
+    root.classList.toggle('anim', fresh);
+    if(!fresh) return;
+    ['.overall-card','.rank-card','.subject-row'].forEach(sel=>{
+      root.querySelectorAll(sel).forEach((n,i)=>n.style.setProperty('--i', i));
+    });
+    root.querySelectorAll('.section-head,.tabs').forEach((n,i)=>n.style.setProperty('--i', i+2));
+    if(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    root.querySelectorAll('[data-pct]').forEach((n,i)=>{
+      const target = parseFloat(n.dataset.pct);
+      if(isNaN(target)) return;
+      const t0 = performance.now() + 200 + i*60, dur = 1100;
+      const tick = now=>{
+        const k = Math.min(1, Math.max(0,(now-t0)/dur));
+        n.textContent = pctStr(target*(1-Math.pow(1-k,3)));
+        if(k<1) requestAnimationFrame(tick);
+      };
+      n.textContent = pctStr(0);
+      requestAnimationFrame(tick);
+    });
+  }
+
+  function renderAll(){
+    if(!state.counts){
+      $('#mainContent').innerHTML = '';
+      $('#banner').innerHTML = '';
+      renderFooter();
+      return;
+    }
+    const items = subjectsForTotals(state.totals, state.counts, state.activeMonth);
+    renderBanner(items);
+    const main = el('div');
+    main.appendChild(renderOverall());
+    main.appendChild(renderTop3(items));
+    main.appendChild(renderTabsAndList(items));
+    $('#mainContent').innerHTML='';
+    $('#mainContent').appendChild(main);
+    renderPanel(items);
+    renderFooter();
+    polishUI();
+
+    if(state.viewingDate){
+      const d = new Date(state.viewingDate+'T00:00:00');
+      const dateStr = d.toLocaleDateString('kk-KZ',{day:'2-digit',month:'2-digit',year:'numeric'});
+      if(state.viewingDate === latestDate()){
+        $('#lastUpdate').innerHTML = `Соңғы жаңарту: <b>${dateStr}</b>`;
+      }else{
+        $('#lastUpdate').innerHTML = `Мұрағат: <b>${dateStr}</b> · <a href="#" id="backToLatest" style="color:var(--sky);text-decoration:underline;">соңғысына оралу</a>`;
+        const link = $('#backToLatest');
+        if(link) link.onclick = (e)=>{ e.preventDefault(); showDate(latestDate()); };
+      }
+    }
+  }
+
+  function renderEmpty(){
+    const msg = state.isAdmin
+      ? 'Күнделікті есеп Excel файлын («Оплатили» бетімен) жоғарыдағы түйме арқылы жүктеңіз — дашборд автоматты түрде есептеп, барлығына көрсетеді.'
+      : 'Әкімші файлды жүктегенше күте тұрыңыз — деректер жүктелген соң осында автоматты пайда болады.';
+    $('#mainContent').innerHTML = `
+      <div class="empty">
+        <div class="display">Әзірге дерек жоқ</div>
+        <p>${msg}</p>
+      </div>`;
+  }
+
+  // ---------- history navigation ----------
+  async function showDate(date){
+    setLoading(true, 'Деректер жүктелуде…');
+    const snap = await loadSnapshot(date);
+    if(!snap){ setLoading(false); return; }
+    const idx = state.dates.indexOf(date);
+    let prevDate = idx>0 ? state.dates[idx-1] : null;
+    // if there's a gap of more than 1 day since the previous upload, treat it as a fresh
+    // start (no delta baseline) rather than comparing across a multi-day break
+    if(prevDate){
+      const d1 = new Date(date+'T00:00:00');
+      const d0 = new Date(prevDate+'T00:00:00');
+      const dayGap = Math.round((d1-d0)/86400000);
+      if(dayGap > 1) prevDate = null;
+    }
+    const prevSnap = prevDate ? await loadSnapshot(prevDate) : null;
+
+    state.viewingDate = date;
+    state.counts = snap.counts;
+    state.totals = snap.totals || await getLegacyTotalsFallback();
+    state.prevCounts = prevSnap ? prevSnap.counts : null;
+    state.overall = await loadOverall(date);
+
+    renderAll();
+    renderDateSelector();
+    setLoading(false);
+  }
+
+  // ---------- file handling ----------
+  async function handleFile(file){
+    clearUploadError();
+    setLoading(true, 'Файл оқылуда…');
+    try{
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf, {type:'array'});
+      setLoading(true, 'Пәндер бойынша есептелуде…');
+      const {counts, unpaidCounts, overall, monthsFound, groupsFound} = parseRenewalCounts(wb);
+
+      const newMonths = monthsFound.filter(m=>!state.knownMonths.includes(m));
+      if(newMonths.length){
+        state.knownMonths = sortMonths([...state.knownMonths, ...newMonths]);
+        await savePeriod({known: state.knownMonths});
+      }
+
+      const newGroups = groupsFound.filter(g=>!state.knownGroups.includes(g));
+      if(newGroups.length){
+        state.knownGroups = [...state.knownGroups, ...newGroups];
+        await saveGroups(state.knownGroups);
+      }
+
+      const today = new Date().toISOString().slice(0,10);
+
+      // Totals belong to each day's own snapshot now. Figure out what today's totals should
+      // start as: keep today's own edits if re-uploading the same day, otherwise carry
+      // forward from the most recent prior date so admin doesn't have to re-enter them daily.
+      const existingToday = await loadSnapshot(today);
+      let totalsForToday;
+      if(existingToday && existingToday.totals){
+        totalsForToday = existingToday.totals;
+      }else{
+        const priorCandidates = state.dates.filter(d=>d!==today).sort();
+        const priorDate = priorCandidates.length ? priorCandidates[priorCandidates.length-1] : null;
+        const priorSnap = priorDate ? await loadSnapshot(priorDate) : null;
+        totalsForToday = (priorSnap && priorSnap.totals) ? {...priorSnap.totals} : {...(await getLegacyTotalsFallback())};
+      }
+
+      // A stream with no configured total (e.g. JUNIOR Орыс тілі, which only exists because SMART-stream
+      // students count as JUNIOR) gets its total from the file: renewed + not renewed students of that stream.
+      // Totals that were set by hand are never overwritten.
+      const autoFilled = [];
+      Object.keys(counts).forEach(k=>{
+        if(totalsForToday[k]) return;
+        const t = counts[k] + (unpaidCounts[k]||0);
+        if(t>0){ totalsForToday[k] = t; autoFilled.push(k); }
+      });
+      await saveSnapshot(today, {counts, totals: totalsForToday, savedAt: new Date().toISOString()});
+      // «Ұзарту отчеты» is computed straight from the file (renewed vs renewed + not renewed students)
+      if(overall){
+        Object.keys(OVERALL_TOTALS).forEach(k=>{
+          if(!overall[k]) overall[k] = {count:0, total:0};
+          overall[k].total = OVERALL_TOTALS[k];
+        });
+        await saveOverallData(today, overall);
+      }
+      if(!state.dates.includes(today)){
+        state.dates.push(today);
+        state.dates.sort();
+        await saveDatesIndex(state.dates);
+      }
+      await showDate(today);
+      renderPeriodSelector();
+      const notices = [];
+      if(newMonths.length) notices.push('жаңа кезең: '+newMonths.join(', '));
+      if(newGroups.length) notices.push('жаңа продукт: '+newGroups.map(groupLabel).join(', '));
+      if(notices.length){
+        showUploadError('Файлда '+notices.join('; ')+' табылды. Тізімдерден таңдап, баптау панелінен жалпы санын енгізіңіз.');
+        $('#uploadError').style.background = 'var(--sky-soft)';
+        $('#uploadError').style.color = 'var(--text)';
+        $('#uploadError').style.borderColor = 'rgba(62,198,224,.35)';
+      }
+    }catch(err){
+      showUploadError('Файлды өңдеу кезінде қате шықты: '+err.message);
+    }finally{
+      setLoading(false);
+    }
+  }
+
+  // ---------- role (admin vs viewer) ----------
+  function applyRole(){
+    $('#adminControls').style.display = state.isAdmin ? 'flex' : 'none';
+    $('#viewerControls').style.display = state.isAdmin ? 'none' : 'flex';
+    if(!state.isAdmin){
+      $('#adminLoginBox').classList.remove('show');
+      $('#settingsPanel').classList.remove('open');
+      $('#adminLoginError').textContent = '';
+    }
+    const showDash = state.isAdmin && state.view==='dashboard';
+    $('#settingsBtn').style.display = showDash ? 'inline-flex' : 'none';
+    $('#uploadLabel').style.display = showDash ? 'inline-flex' : 'none';
+    const showQol = state.isAdmin && state.view==='qolkhat';
+    $('#qolkhatUploadLabel').style.display = showQol ? 'inline-flex' : 'none';
+    const showJuzeng = state.isAdmin && state.view==='juzeng';
+    $('#juzengUploadLabel').style.display = showJuzeng ? 'inline-flex' : 'none';
+    $('#periodRow').style.display = state.view==='dashboard' ? 'flex' : 'none';
+    $('#dateRow').style.display = state.view==='dashboard' ? 'flex' : 'none';
+    $('#juzengPeriodRow').style.display = state.view==='juzeng' ? 'flex' : 'none';
+    $('#lastUpdate').style.display = state.view==='dashboard' ? 'block' : 'none';
+    renderPeriodSelector();
+    renderDateSelector();
+    if(state.view==='juzeng') renderJuzengPeriodSelector();
+  }
+
+  function switchView(view){
+    state.view = view;
+    $('#navDashboard').classList.toggle('active', view==='dashboard');
+    $('#navQolkhat').classList.toggle('active', view==='qolkhat');
+    $('#navJuzeng').classList.toggle('active', view==='juzeng');
+    $('#viewDashboard').style.display = view==='dashboard' ? 'block' : 'none';
+    $('#viewQolkhat').style.display = view==='qolkhat' ? 'block' : 'none';
+    $('#viewJuzeng').style.display = view==='juzeng' ? 'block' : 'none';
+    if(view==='dashboard'){
+      $('#pageEyebrow').textContent = 'Ұзарту дашборды';
+      $('#pageTitle').textContent = 'Пәндер бойынша ұзарту';
+      $('#pageSubtitle').textContent = '';
+    }else if(view==='qolkhat'){
+      $('#pageEyebrow').textContent = 'Қолхат жазғандар';
+      $('#pageTitle').textContent = 'Қолхат жазған оқушылар тізімі';
+      $('#pageSubtitle').textContent = 'amoCRM экспортынан алынған, қолхат жазған оқушылардың күнделікті тізімі мен саны.';
+      renderQolkhat();
+    }else if(view==='juzeng'){
+      $('#pageEyebrow').textContent = 'IELTS';
+      $('#pageTitle').textContent = 'IELTS — ағылшын курстары';
+      $('#pageSubtitle').textContent = 'IELTS және General курстарының айлық ұзарту (продление) көрсеткіштері.';
+      renderJuzengPeriodSelector();
+      renderJuzeng();
+    }
+    applyRole();
+  }
+
+  // ---------- init ----------
+  async function init(){
+    setLoading(true, 'Жүктелуде…');
+    state.isAdmin = await loadAdminFlag();
+    const period = await loadPeriod();
+    state.knownMonths = sortMonths(period.known && period.known.length ? period.known : ['ШІЛДЕ']);
+    const localMonth = loadLocalMonth();
+    state.activeMonth = (localMonth && (localMonth===ALL_MONTHS || state.knownMonths.includes(localMonth)))
+      ? localMonth
+      : state.knownMonths[state.knownMonths.length-1];
+    state.knownGroups = await loadGroups();
+    const qol = await loadQolkhat();
+    if(qol){
+      state.qolkhatList = qol.list || [];
+      state.qolkhatUpdatedAt = qol.uploadedAt || null;
+    }
+    $('#qolkhatBadge').textContent = state.qolkhatList.length ? String(state.qolkhatList.length) : '';
+    state.juzengMonths = await loadJuzengMonths();
+    if(state.juzengMonths.length){
+      state.juzengActiveMonth = state.juzengMonths[state.juzengMonths.length-1];
+      state.juzengData = await loadJuzengSnapshot(state.juzengActiveMonth);
+    }
+    applyRole();
+    state.totals = await loadTotals();
+    state.dates = (await loadDatesIndex()).sort();
+    if(state.dates.length){
+      await showDate(state.dates[state.dates.length-1]);
+    }else{
+      renderEmpty(); renderDateSelector(); renderFooter();
+    }
+    setLoading(false);
+  }
+
+  async function handleQolkhatFile(file){
+    clearUploadError('qolkhatUploadError');
+    setLoading(true, 'Қолхат файлы оқылуда…');
+    try{
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf, {type:'array'});
+      const list = parseQolkhatFile(wb);
+      const payload = {list, uploadedAt: new Date().toISOString()};
+      await saveQolkhat(payload);
+      state.qolkhatList = list;
+      state.qolkhatUpdatedAt = payload.uploadedAt;
+      renderQolkhat();
+    }catch(err){
+      showUploadError('Файлды өңдеу кезінде қате шықты: '+err.message, 'qolkhatUploadError');
+    }finally{
+      setLoading(false);
+    }
+  }
+
+  async function handleJuzengFile(file){
+    clearUploadError('juzengUploadError');
+    setLoading(true, 'IELTS файлы оқылуда…');
+    try{
+      const buf = await file.arrayBuffer();
+      const wb = XLSX.read(buf, {type:'array'});
+      const byMonth = parseJuzengFile(wb);
+      const months = Object.keys(byMonth);
+      if(!months.length) throw new Error('Файлдан ешбір ай/курс табылмады. Бет атаулары «IELTS TAMYZ» секілді болуы керек.');
+      for(const m of months){
+        const payload = {...byMonth[m], uploadedAt: new Date().toISOString()};
+        await saveJuzengSnapshot(m, payload);
+      }
+      const newMonths = months.filter(m=>!state.juzengMonths.includes(m));
+      if(newMonths.length){
+        state.juzengMonths = [...state.juzengMonths, ...newMonths];
+        await saveJuzengMonths(state.juzengMonths);
+      }
+      state.juzengActiveMonth = months[months.length-1];
+      state.juzengData = await loadJuzengSnapshot(state.juzengActiveMonth);
+      renderJuzengPeriodSelector();
+      renderJuzeng();
+    }catch(err){
+      showUploadError('Файлды өңдеу кезінде қате шықты: '+err.message, 'juzengUploadError');
+    }finally{
+      setLoading(false);
+    }
+  }
+
+  function refreshCurrentView(){
+    if(state.view==='qolkhat') renderQolkhat();
+    else if(state.view==='juzeng') renderJuzeng();
+    else renderAll();
+  }
+
+  $('#fileInput').addEventListener('change', (e)=>{
+    const f = e.target.files[0];
+    if(f) handleFile(f);
+    e.target.value = '';
+  });
+  $('#qolkhatFileInput').addEventListener('change', (e)=>{
+    const f = e.target.files[0];
+    if(f) handleQolkhatFile(f);
+    e.target.value = '';
+  });
+  $('#juzengFileInput').addEventListener('change', (e)=>{
+    const f = e.target.files[0];
+    if(f) handleJuzengFile(f);
+    e.target.value = '';
+  });
+  $('#navDashboard').addEventListener('click', ()=>switchView('dashboard'));
+  $('#navQolkhat').addEventListener('click', ()=>switchView('qolkhat'));
+  $('#navJuzeng').addEventListener('click', ()=>switchView('juzeng'));
+  $('#settingsBtn').addEventListener('click', ()=>{
+    $('#settingsPanel').classList.toggle('open');
+    if($('#settingsPanel').classList.contains('open')){
+      renderPanel(subjectsForTotals(state.totals, state.counts || {}, state.activeMonth));
+      renderCopyTotalsPanel();
+    }
+  });
+  $('#logoutBtn').addEventListener('click', async ()=>{
+    state.isAdmin = false;
+    await saveAdminFlag(false);
+    applyRole();
+    refreshCurrentView();
+  });
+  $('#adminLoginBtn').addEventListener('click', ()=>{
+    const box = $('#adminLoginBox');
+    box.classList.toggle('show');
+    if(box.classList.contains('show')) $('#adminCodeInput').focus();
+  });
+  async function tryAdminLogin(){
+    const input = $('#adminCodeInput');
+    const val = input.value.trim();
+    if(val === ADMIN_CODE){
+      state.isAdmin = true;
+      await saveAdminFlag(true);
+      input.value = '';
+      applyRole();
+      refreshCurrentView();
+    }else{
+      $('#adminLoginError').textContent = 'Код қате, қайта көріңіз';
+      input.value = '';
+      input.focus();
+    }
+  }
+  $('#adminCodeSubmit').addEventListener('click', tryAdminLogin);
+  $('#adminCodeInput').addEventListener('keydown', (e)=>{ if(e.key==='Enter') tryAdminLogin(); });
+
+  document.addEventListener('click', (e)=>{
+    const panel = $('#periodManagePanel');
+    const btn = $('#periodManageBtn');
+    if(panel && panel.classList.contains('open') && !panel.contains(e.target) && e.target!==btn){
+      panel.classList.remove('open');
+    }
+  });
+
+  init();
+})();
+</script>
+</body>
+</html>
