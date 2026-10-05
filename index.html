@@ -1140,6 +1140,7 @@
     prevCounts: null,      // counts for the date just before viewingDate
     activeTab: 'SMART',
     savedAt: null,         // ISO time the viewed day's file was uploaded
+    manual: {},            // counts typed by hand for the viewed day (survive a same-day re-upload)
     isAdmin: false,
     activeMonth: 'ШІЛДЕ',  // currently selected reporting period
     knownMonths: ['ШІЛДЕ'], // all months ever seen in uploaded files
@@ -1170,6 +1171,10 @@
     box.insertAdjacentHTML('beforeend', ic('alert'));
     box.appendChild(document.createTextNode(msg));
     box.classList.add('show');
+  };
+  // a value is shown immediately but only counts once saved: tell the user when the save did not go through
+  const showSaveFailed = ()=>{
+    showUploadError('Өзгеріс дерекқорға сақталмады (байланысты тексеріңіз). Бетті жаңартсаңыз, ескі сан қайтады.');
   };
   const clearUploadError = (targetId)=>{
     const box = $('#'+(targetId||'uploadError'));
@@ -1910,9 +1915,9 @@
             const val = parseInt(totalInput.value,10);
             if(!val || val<=0 || !state.viewingDate) return;
             state.totals[item.key] = val;
-            const ok = await saveSnapshot(state.viewingDate, {counts: state.counts, totals: state.totals, savedAt: state.savedAt || new Date().toISOString()});
-            if(ok) showTick();
-            renderAll();
+            renderAll(); // show the new number right away, then save in the background
+            const ok = await saveSnapshot(state.viewingDate, {counts: state.counts, totals: state.totals, manual: state.manual || {}, savedAt: state.savedAt || new Date().toISOString()});
+            if(ok) showTick(); else showSaveFailed();
           }, 500);
         });
 
@@ -1924,9 +1929,11 @@
             if(isNaN(val) || val<0 || !state.viewingDate) return;
             state.counts = state.counts || {};
             state.counts[item.key] = val;
-            const ok = await saveSnapshot(state.viewingDate, {counts: state.counts, totals: state.totals, savedAt: state.savedAt || new Date().toISOString()});
-            if(ok) showTick();
-            renderAll();
+            state.manual = state.manual || {};
+            state.manual[item.key] = val;
+            renderAll(); // show the new number right away, then save in the background
+            const ok = await saveSnapshot(state.viewingDate, {counts: state.counts, totals: state.totals, manual: state.manual || {}, savedAt: state.savedAt || new Date().toISOString()});
+            if(ok) showTick(); else showSaveFailed();
           }, 500);
         });
 
@@ -1946,9 +1953,10 @@
           delete state.totals[item.key];
           if(state.counts && state.viewingDate){
             delete state.counts[item.key];
+            if(state.manual) delete state.manual[item.key];
           }
           if(state.viewingDate){
-            await saveSnapshot(state.viewingDate, {counts: state.counts, totals: state.totals, savedAt: state.savedAt || new Date().toISOString()});
+            await saveSnapshot(state.viewingDate, {counts: state.counts, totals: state.totals, manual: state.manual || {}, savedAt: state.savedAt || new Date().toISOString()});
           }
           renderAll();
         });
@@ -1993,7 +2001,7 @@
       for(const d of targetDates){
         const snap = await loadSnapshot(d);
         if(!snap) continue;
-        await saveSnapshot(d, {counts: snap.counts, totals: {...state.totals}, savedAt: snap.savedAt || new Date().toISOString()});
+        await saveSnapshot(d, {counts: snap.counts, totals: {...state.totals}, manual: snap.manual || {}, savedAt: snap.savedAt || new Date().toISOString()});
         done++;
         status.textContent = 'Қолданылуда… ('+done+'/'+targetDates.length+')';
       }
@@ -2438,6 +2446,7 @@
 
     state.viewingDate = date;
     state.savedAt = snap.savedAt || null; // exact upload time of this day's file
+    state.manual = snap.manual || {};
     state.counts = snap.counts;
     state.totals = snap.totals || await getLegacyTotalsFallback();
     state.prevCounts = prevSnap ? prevSnap.counts : null;
@@ -2495,7 +2504,11 @@
         const t = counts[k] + (unpaidCounts[k]||0);
         if(t>0){ totalsForToday[k] = t; autoFilled.push(k); }
       });
-      await saveSnapshot(today, {counts, totals: totalsForToday, savedAt: new Date().toISOString()});
+      // numbers typed by hand today win over the file when the same day's file is uploaded again
+      const manualToday = (existingToday && existingToday.manual) ? existingToday.manual : {};
+      const keptManual = Object.keys(manualToday);
+      keptManual.forEach(k=>{ counts[k] = manualToday[k]; });
+      await saveSnapshot(today, {counts, totals: totalsForToday, manual: manualToday, savedAt: new Date().toISOString()});
       // «Ұзарту отчеты» is computed straight from the file (renewed vs renewed + not renewed students)
       if(overall){
         Object.keys(OVERALL_TOTALS).forEach(k=>{
@@ -2514,8 +2527,11 @@
       const notices = [];
       if(newMonths.length) notices.push('жаңа кезең: '+newMonths.join(', '));
       if(newGroups.length) notices.push('жаңа продукт: '+newGroups.map(groupLabel).join(', '));
-      if(notices.length){
-        showUploadError('Файлда '+notices.join('; ')+' табылды. Тізімдерден таңдап, баптау панелінен жалпы санын енгізіңіз.');
+      const msgs = [];
+      if(notices.length) msgs.push('Файлда '+notices.join('; ')+' табылды. Тізімдерден таңдап, баптау панелінен жалпы санын енгізіңіз.');
+      if(keptManual.length) msgs.push('Қолмен өзгертілген '+keptManual.length+' сан сақталды (файлдағы мәннен басым).');
+      if(msgs.length){
+        showUploadError(msgs.join(' '));
         $('#uploadError').style.background = 'var(--sky-soft)';
         $('#uploadError').style.color = 'var(--text)';
         $('#uploadError').style.borderColor = 'rgba(62,198,224,.35)';
