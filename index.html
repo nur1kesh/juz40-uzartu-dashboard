@@ -1414,13 +1414,14 @@
       const contact = (phoneIdx>=0 && String(row[phoneIdx]||'').trim()) || (mailIdx>=0 && String(row[mailIdx]||'').trim().toLowerCase()) || '';
       const key = (name && contact) ? name+'|'+contact : '#'+r; // no identity -> treat the row as its own student
       let st = students.get(key);
-      if(!st){ st = {rowProduct, raws:new Set()}; students.set(key, st); }
+      if(!st){ st = {rowProduct, rows:0, raws:new Set()}; students.set(key, st); }
+      st.rows++;
       idxs.forEach(ci=>{
         const raw = String(row[ci]||'').trim();
         if(raw) st.raws.add(raw);
       });
     }
-    return Array.from(students.values()).map(st=>({rowProduct: st.rowProduct, raws: Array.from(st.raws)}));
+    return Array.from(students.values()).map(st=>({rowProduct: st.rowProduct, rows: st.rows, raws: Array.from(st.raws)}));
   }
 
   function parseRenewalCounts(workbook){
@@ -1436,11 +1437,13 @@
     const overall = {}; // group|month -> {count,total}: renewed students / renewed + not renewed students
     const monthsFound = new Set();
     const groupsFound = new Set();
-    const bump = (g,m,renewed)=>{
+    // «Ұзарту отчеты» head-count follows the platform's rows: a person listed in two product rows counts
+    // twice (like the platform's own «Студенты Факт»); subject streams and money stay per person
+    const bump = (g,m,renewed,n)=>{
       const k = g+'|'+m;
       if(!overall[k]) overall[k] = {count:0, total:0};
-      overall[k].total++;
-      if(renewed) overall[k].count++;
+      overall[k].total += n;
+      if(renewed) overall[k].count += n;
     };
     collectStudents(rows, header, /^продленн/i).forEach(st=>{
       const {items, anchor} = resolveStudentStreams(st.raws, st.rowProduct);
@@ -1450,7 +1453,7 @@
         const key = it.product+'|'+it.subject+'|'+it.month;
         counts[key] = (counts[key]||0) + 1;
       });
-      if(anchor){ groupsFound.add(anchor.product); bump(anchor.product, anchor.month, true); }
+      if(anchor){ groupsFound.add(anchor.product); bump(anchor.product, anchor.month, true, st.rows); }
     });
 
     // "Не оплатили" sheet: the students who did not renew join the denominator (same product/month rules).
@@ -1469,7 +1472,7 @@
               const key = it.product+'|'+it.subject+'|'+it.month;
               unpaidCounts[key] = (unpaidCounts[key]||0) + 1;
             });
-            if(anchor){ groupsFound.add(anchor.product); monthsFound.add(anchor.month); bump(anchor.product, anchor.month, false); }
+            if(anchor){ groupsFound.add(anchor.product); monthsFound.add(anchor.month); bump(anchor.product, anchor.month, false, st.rows); }
           });
         }
       }
