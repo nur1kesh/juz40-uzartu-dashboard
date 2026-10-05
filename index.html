@@ -1679,7 +1679,8 @@
     delete migrated.smart; delete migrated.junior;
     // fixed «жалпы» win over whatever was saved for the date (also fixes already-uploaded days)
     Object.keys(OVERALL_TOTALS).forEach(k=>{
-      if(migrated[k]) migrated[k] = {count: migrated[k].count||0, total: OVERALL_TOTALS[k]};
+      // a card edited by hand (manual flag) keeps its own numbers; the fixed plan only fills the rest
+      if(migrated[k] && !migrated[k].manual) migrated[k] = {count: migrated[k].count||0, total: OVERALL_TOTALS[k]};
     });
 
     const isAll = state.activeMonth === ALL_MONTHS;
@@ -1762,10 +1763,11 @@
               const cVal = parseInt(inputs[0].value,10)||0;
               const tVal = parseInt(inputs[1].value,10)||0;
               state.overall = migrated;
-              state.overall[gd.key] = {count:cVal, total:tVal};
+              state.overall[gd.key] = {count:cVal, total:tVal, manual:true};
               if(!state.viewingDate) return;
-              await saveOverallData(state.viewingDate, state.overall);
-              renderAll();
+              renderAll(); // show the typed numbers right away, then save in the background
+              const saved = await saveOverallData(state.viewingDate, state.overall);
+              if(saved===false) showSaveFailed();
             }, 500);
           });
         });
@@ -2511,9 +2513,12 @@
       await saveSnapshot(today, {counts, totals: totalsForToday, manual: manualToday, savedAt: new Date().toISOString()});
       // «Ұзарту отчеты» is computed straight from the file (renewed vs renewed + not renewed students)
       if(overall){
+        // cards edited by hand earlier today stay as they were typed
+        const prevOverall = (await loadOverall(today)) || {};
+        Object.keys(prevOverall).forEach(k=>{ if(prevOverall[k] && prevOverall[k].manual) overall[k] = prevOverall[k]; });
         Object.keys(OVERALL_TOTALS).forEach(k=>{
           if(!overall[k]) overall[k] = {count:0, total:0};
-          overall[k].total = OVERALL_TOTALS[k];
+          if(!overall[k].manual) overall[k].total = OVERALL_TOTALS[k];
         });
         await saveOverallData(today, overall);
       }
