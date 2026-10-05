@@ -1139,6 +1139,7 @@
     counts: null,          // {group|subject|month: count} for viewingDate (full breakdown, all months)
     prevCounts: null,      // counts for the date just before viewingDate
     activeTab: 'SMART',
+    savedAt: null,         // ISO time the viewed day's file was uploaded
     isAdmin: false,
     activeMonth: 'ШІЛДЕ',  // currently selected reporting period
     knownMonths: ['ШІЛДЕ'], // all months ever seen in uploaded files
@@ -1906,7 +1907,7 @@
             const val = parseInt(totalInput.value,10);
             if(!val || val<=0 || !state.viewingDate) return;
             state.totals[item.key] = val;
-            const ok = await saveSnapshot(state.viewingDate, {counts: state.counts, totals: state.totals, savedAt: new Date().toISOString()});
+            const ok = await saveSnapshot(state.viewingDate, {counts: state.counts, totals: state.totals, savedAt: state.savedAt || new Date().toISOString()});
             if(ok) showTick();
             renderAll();
           }, 500);
@@ -1920,7 +1921,7 @@
             if(isNaN(val) || val<0 || !state.viewingDate) return;
             state.counts = state.counts || {};
             state.counts[item.key] = val;
-            const ok = await saveSnapshot(state.viewingDate, {counts: state.counts, totals: state.totals, savedAt: new Date().toISOString()});
+            const ok = await saveSnapshot(state.viewingDate, {counts: state.counts, totals: state.totals, savedAt: state.savedAt || new Date().toISOString()});
             if(ok) showTick();
             renderAll();
           }, 500);
@@ -1944,7 +1945,7 @@
             delete state.counts[item.key];
           }
           if(state.viewingDate){
-            await saveSnapshot(state.viewingDate, {counts: state.counts, totals: state.totals, savedAt: new Date().toISOString()});
+            await saveSnapshot(state.viewingDate, {counts: state.counts, totals: state.totals, savedAt: state.savedAt || new Date().toISOString()});
           }
           renderAll();
         });
@@ -2389,8 +2390,11 @@
     polishUI();
 
     if(state.viewingDate){
-      const d = new Date(state.viewingDate+'T00:00:00');
-      const dateStr = d.toLocaleDateString('kk-KZ',{day:'2-digit',month:'2-digit',year:'numeric'});
+      const pad = n=>String(n).padStart(2,'0');
+      const ts = state.savedAt ? new Date(state.savedAt) : null;
+      const d = (ts && !isNaN(ts)) ? ts : new Date(state.viewingDate+'T00:00:00');
+      // «05.10.2026 · 14:32» (browser's local time); older snapshots without a saved time show the date only
+      const dateStr = pad(d.getDate())+'.'+pad(d.getMonth()+1)+'.'+d.getFullYear() + ((ts && !isNaN(ts)) ? ' · '+pad(d.getHours())+':'+pad(d.getMinutes()) : '');
       if(state.viewingDate === latestDate()){
         $('#lastUpdate').innerHTML = `Соңғы жаңарту: <b>${dateStr}</b>`;
       }else{
@@ -2430,6 +2434,7 @@
     const prevSnap = prevDate ? await loadSnapshot(prevDate) : null;
 
     state.viewingDate = date;
+    state.savedAt = snap.savedAt || null; // exact upload time of this day's file
     state.counts = snap.counts;
     state.totals = snap.totals || await getLegacyTotalsFallback();
     state.prevCounts = prevSnap ? prevSnap.counts : null;
