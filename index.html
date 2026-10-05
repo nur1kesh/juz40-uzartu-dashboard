@@ -1115,6 +1115,10 @@
   // Fixed «жалпы» (denominators) for the «Ұзарту отчеты» cards, key = product|month (TURBO = SMART PRO).
   // They replace the totals computed from the file; the renewed count (numerator) still comes from the file.
   // Sum = 36858. Edit here when the plan changes.
+  // A card can be edited by hand per field: mt = «жалпы» typed, mc = «саны» typed. Anything not typed by hand keeps
+  // coming from the file / fixed plan. (Old saves only had `manual: true`: those were «жалпы» edits.)
+  const isMt = e => !!(e && (e.mt || (e.manual && e.mc === undefined && e.mt === undefined)));
+  const isMc = e => !!(e && e.mc);
   const OVERALL_TOTALS = {
     'SMART|ШІЛДЕ':5560, 'SMART|ТАМЫЗ':8706, 'SMART|ҚЫРКҮЙЕК':18655,
     'JUNIOR|ШІЛДЕ':396, 'JUNIOR|ТАМЫЗ':616, 'JUNIOR|ҚЫРКҮЙЕК':2294,
@@ -1680,7 +1684,7 @@
     // fixed «жалпы» win over whatever was saved for the date (also fixes already-uploaded days)
     Object.keys(OVERALL_TOTALS).forEach(k=>{
       // a card edited by hand (manual flag) keeps its own numbers; the fixed plan only fills the rest
-      if(migrated[k] && !migrated[k].manual) migrated[k] = {count: migrated[k].count||0, total: OVERALL_TOTALS[k]};
+      if(migrated[k] && !isMt(migrated[k])) migrated[k] = Object.assign({}, migrated[k], {count: migrated[k].count||0, total: OVERALL_TOTALS[k]});
     });
 
     const isAll = state.activeMonth === ALL_MONTHS;
@@ -1756,14 +1760,19 @@
         `;
         const inputs = editRow.querySelectorAll('input');
         let timer;
-        inputs.forEach(inp=>{
+        const touched = new Set();
+        inputs.forEach((inp, idx)=>{
           inp.addEventListener('input', ()=>{
+            touched.add(idx);
             clearTimeout(timer);
             timer = setTimeout(async ()=>{
               const cVal = parseInt(inputs[0].value,10)||0;
               const tVal = parseInt(inputs[1].value,10)||0;
               state.overall = migrated;
-              state.overall[gd.key] = {count:cVal, total:tVal, manual:true};
+              const prev = migrated[gd.key] || {};
+              state.overall[gd.key] = {count:cVal, total:tVal, manual:true,
+                mc: isMc(prev) || touched.has(0), mt: isMt(prev) || touched.has(1)};
+              touched.clear();
               if(!state.viewingDate) return;
               renderAll(); // show the typed numbers right away, then save in the background
               const saved = await saveOverallData(state.viewingDate, state.overall);
@@ -2481,7 +2490,9 @@
         await saveGroups(state.knownGroups);
       }
 
-      const today = new Date().toISOString().slice(0,10);
+      const nowLocal = new Date();
+      const p2 = n=>String(n).padStart(2,'0');
+      const today = nowLocal.getFullYear()+'-'+p2(nowLocal.getMonth()+1)+'-'+p2(nowLocal.getDate()); // local day, not UTC
 
       // Totals belong to each day's own snapshot now. Figure out what today's totals should
       // start as: keep today's own edits if re-uploading the same day, otherwise carry
@@ -2513,12 +2524,17 @@
       await saveSnapshot(today, {counts, totals: totalsForToday, manual: manualToday, savedAt: new Date().toISOString()});
       // «Ұзарту отчеты» is computed straight from the file (renewed vs renewed + not renewed students)
       if(overall){
-        // cards edited by hand earlier today stay as they were typed
+        // fields typed by hand earlier today stay as typed; everything else is taken from the new file
         const prevOverall = (await loadOverall(today)) || {};
-        Object.keys(prevOverall).forEach(k=>{ if(prevOverall[k] && prevOverall[k].manual) overall[k] = prevOverall[k]; });
+        Object.keys(prevOverall).forEach(k=>{
+          const e = prevOverall[k];
+          if(!e || !(isMt(e) || isMc(e))) return;
+          const cur = overall[k] || {count:0, total:0};
+          overall[k] = {count: isMc(e) ? e.count : cur.count, total: isMt(e) ? e.total : cur.total, manual:true, mc:isMc(e), mt:isMt(e)};
+        });
         Object.keys(OVERALL_TOTALS).forEach(k=>{
           if(!overall[k]) overall[k] = {count:0, total:0};
-          if(!overall[k].manual) overall[k].total = OVERALL_TOTALS[k];
+          if(!isMt(overall[k])) overall[k].total = OVERALL_TOTALS[k];
         });
         await saveOverallData(today, overall);
       }
