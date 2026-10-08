@@ -950,6 +950,14 @@
     background:none;-webkit-background-clip:border-box;background-clip:border-box;
     color:var(--text);margin-left:0;
   }
+
+  /* ---------- SMART PRO lists panel ---------- */
+  .prolist-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;}
+  .prolist-card{background:var(--surface-2);border:1px solid var(--line);border-radius:16px;padding:14px 16px;display:flex;flex-direction:column;gap:8px;align-items:flex-start;}
+  .pl-title{font-family:'Onest',sans-serif;font-weight:800;font-size:13px;letter-spacing:.12em;color:var(--mint);}
+  .pl-meta{font-size:12.5px;color:var(--text-dim);line-height:1.5;word-break:break-word;}
+  .pl-sum{margin-top:12px;font-size:13px;color:var(--text-dim);line-height:1.6;}
+  .pl-sum b{color:var(--text);}
 </style>
 </head>
 <body>
@@ -1014,6 +1022,12 @@
           <div class="hint">Бұл сандар файлдан алынбайды — өзіңіз енгізесіз, олар сақталып қалады</div>
         </div>
         <div id="panelBody"></div>
+
+        <div class="section-head" style="margin-top:26px;">
+          <h2>SMART PRO бекітілген тізімі</h2>
+          <div class="hint">Тек осы тізімдегілер SMART PRO болып есептеледі</div>
+        </div>
+        <div id="proListPanel"></div>
 
         <div class="section-head" style="margin-top:26px;">
           <h2>Жалпы сандарды бірнеше күнге көшіру</h2>
@@ -1119,6 +1133,8 @@
   // coming from the file / fixed plan. (Old saves only had `manual: true`: those were «жалпы» edits.)
   const isMt = e => !!(e && (e.mt || (e.manual && e.mc === undefined && e.mt === undefined)));
   const isMc = e => !!(e && e.mc);
+  // fixed «жалпы» per card (SMART PRO stays 322 / 309: the confirmed lists decide WHO counts, not the plan)
+  const overallPlan = ()=>Object.assign({}, OVERALL_TOTALS);
   const OVERALL_TOTALS = {
     'SMART|ШІЛДЕ':5560, 'SMART|ТАМЫЗ':8706, 'SMART|ҚЫРКҮЙЕК':18655,
     'JUNIOR|ШІЛДЕ':396, 'JUNIOR|ТАМЫЗ':616, 'JUNIOR|ҚЫРКҮЙЕК':2294,
@@ -1145,6 +1161,8 @@
     activeTab: 'SMART',
     savedAt: null,         // ISO time the viewed day's file was uploaded
     manual: {},            // counts typed by hand for the viewed day (survive a same-day re-upload)
+    proLists: {entries:[], files:{}}, // confirmed SMART PRO lists (ТАМЫЗ / ҚЫРКҮЙЕК), stored in Firestore
+    proIdx: null,
     isAdmin: false,
     activeMonth: 'ШІЛДЕ',  // currently selected reporting period
     knownMonths: ['ШІЛДЕ'], // all months ever seen in uploaded files
@@ -1364,20 +1382,95 @@
     return null;
   }
 
-  // Resolves product + month for every stream text of ONE student:
+  /* ===== SMART PRO: confirmed lists =====
+     Only students on the confirmed lists (ТАМЫЗ / ҚЫРКҮЙЕК) count as SMART PRO. A student that has SMART-PRO
+     streams in the ROP but is NOT on a list is a plain SMART/JUNIOR student: the streams studied before decide
+     (the EARLIEST one, renewed or not), e.g. SMART ШІЛДЕ => counted as a SMART ШІЛДЕ student. */
+  const PRO_MAP = {'ү':'у','ұ':'у','қ':'к','ғ':'г','ң':'н','ө':'о','ә':'а','һ':'х','і':'и','ё':'е'};
+  // name without regard to word order and Kazakh letter variants
+  const proKey = v => String(v||'').toLowerCase().replace(/[үұқғңөәһіё]/g, c=>PRO_MAP[c]).replace(/[^\p{L}\p{N}\s]/gu,' ').split(/\s+/).filter(Boolean).sort().join(' ');
+  const proPhone = v => { const d = String(v||'').replace(/\D/g,''); return d.length>=10 ? d.slice(-10) : ''; };
+  const proMail = v => { const s = String(v||'').trim().toLowerCase().replace(/^@+/,''); return (s.includes('@') && s.includes('.')) ? s : ''; };
+
+  // One list file = one workbook with a sheet per combo («ИНФОМАТ», «БИОХИМ» …). The month of a student is the month of the
+  // list FILE (slot) it was uploaded into: the course text can carry a wrong month (e.g. 31 «ДЖТАНГЛ IELTS | ТАМЫЗ» rows
+  // inside the ҚЫРКҮЙЕК list, whose ROP streams are all ҚЫРКҮЙЕК).
+  function parseProListWorkbook(wb, slotMonth){
+    const out = [];
+    wb.SheetNames.forEach(sn=>{
+      const ws = wb.Sheets[sn];
+      const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
+      const hiddenRows = ws['!rows'] || [];
+      const base = ws['!ref'] ? XLSX.utils.decode_range(ws['!ref']).s.r : 0;
+      let hi = -1;
+      for(let i=0;i<Math.min(5,rows.length);i++){ if(rows[i].some(x=>/АТЫ-ЖӨНІ/i.test(String(x)))){ hi = i; break; } }
+      if(hi<0) return;
+      const h = rows[hi].map(x=>String(x||'').toUpperCase());
+      const cName = h.findIndex(x=>x.includes('АТЫ-ЖӨНІ')), cMail = h.findIndex(x=>x.includes('ПОЧТА')),
+            cPh = h.findIndex(x=>x.includes('НОМЕР')), cCourse = h.findIndex(x=>x.includes('ҚАЙ КУРС'));
+      for(let r=hi+1;r<rows.length;r++){
+        const row = rows[r];
+        const name = String(row[cName]||'').trim();
+        if(!name) continue;
+        if(hiddenRows[base+r] && hiddenRows[base+r].hidden) continue; // a row hidden in Excel = taken off the list
+        const course = cCourse>=0 ? String(row[cCourse]||'').trim() : '';
+        out.push({n:name, e:cMail>=0?proMail(row[cMail]):'', p:cPh>=0?proPhone(row[cPh]):'', m:slotMonth, c:sn, s:slotMonth});
+      }
+    });
+    return out;
+  }
+  function buildProIndex(entries){
+    const idx = {byMail:new Map(), byPhone:new Map(), byName:new Map(), size:{}, entries:(entries||[]).length};
+    (entries||[]).forEach(en=>{
+      if(en.e) idx.byMail.set(en.e, en);
+      if(en.p) idx.byPhone.set(en.p, en);
+      const k = proKey(en.n);
+      if(k.split(' ').length>=2) idx.byName.set(k, en);
+      idx.size[en.m] = (idx.size[en.m]||0) + 1;
+    });
+    return idx;
+  }
+  // student -> list entry. Mail/phone are exact; a bare name only counts when the ROP shows SMART-PRO signs for
+  // that student (TURBO row or a SMART-PRO stream), so a common name cannot pull in a stranger.
+  // Every list entry belongs to ONE student (the strongest match wins).
+  function assignPro(students, idx){
+    const map = new Map();
+    if(!idx || !idx.entries) return map;
+    const best = new Map();
+    students.forEach(st=>{
+      let en = null, tier = 0;
+      if(st.email && idx.byMail.has(st.email)){ en = idx.byMail.get(st.email); tier = 3; }
+      else if(st.phone && idx.byPhone.has(st.phone)){ en = idx.byPhone.get(st.phone); tier = 2; }
+      else{
+        const k = proKey(st.name);
+        if(st.signal && k.split(' ').length>=2 && idx.byName.has(k)){ en = idx.byName.get(k); tier = 1; }
+      }
+      if(!en) return;
+      const cur = best.get(en);
+      if(!cur || tier>cur.tier) best.set(en, {st, tier});
+    });
+    best.forEach(({st}, en)=>map.set(st, en));
+    return map;
+  }
+
+  // Resolves product + month for every stream text of ONE student (see the SMART PRO notes above):
   //  - product comes from the stream text, falling back to the row's (normalized) product
   //  - a student who has JUNIOR streams is a JUNIOR student: a stray SMART stream next to them
   //    (e.g. a SMART subject taken because JUNIOR had too few students) is counted as JUNIOR
   //  - "TOEFL ITP <month>" streams take product and month of the student's EARLIEST other stream
   //    (ШІЛДЕ < ТАМЫЗ < ҚЫРКҮЙЕК), because the TOEFL stream name only carries the last extension month.
-  //    A student with only a TOEFL stream keeps the month written in it.
-  function resolveStudentStreams(raws, rowProduct){
-    const items = [];
-    raws.forEach(raw=>{
+  //  - on a confirmed SMART PRO list  => the student's bucket is TURBO + the list's month
+  //  - SMART-PRO streams but not on a list => SMART-PRO streams are dropped, bucket = earliest earlier stream
+  //  useLists=false (no lists uploaded yet) keeps the previous behaviour.
+  function resolveStudentStreams(st, pro, useLists){
+    const toItem = raw=>{
       const r = extractStream(raw);
-      if(!r || !r.subject || !r.month) return;
-      items.push({subject:r.subject, month:r.month, product:r.product || rowProduct, toefl:isToeflItp(raw)});
-    });
+      if(!r || !r.subject || !r.month) return null;
+      return {subject:r.subject, month:r.month, product:r.product || st.rowProduct, toefl:isToeflItp(raw)};
+    };
+    const unconfirmed = !!(useLists && !pro && st.signal);
+    let items = st.raws.map(toItem).filter(Boolean);
+    if(unconfirmed) items = items.filter(it=>it.product!=='TURBO');
     if(items.some(it=>it.product==='JUNIOR')){
       items.forEach(it=>{ if(it.product==='SMART') it.product = 'JUNIOR'; });
     }
@@ -1392,13 +1485,31 @@
         it.product = earliest.product;
       }
     });
-    // the student's own bucket for the overall report: earliest stream decides (TOEFL only if nothing else);
-    // a student with SMART-PRO (TURBO) streams counts as TURBO
-    const anchorSrc = earliest || items[0] || null;
-    if(!anchorSrc) return {items, anchor:null};
-    const turbo = items.filter(it=>it.product==='TURBO' && !it.toefl).sort((a,b)=>monthRank(a.month)-monthRank(b.month))[0];
-    const anchor = turbo || anchorSrc;
-    return {items, anchor:{product: anchor.product, month: anchor.month}};
+    let anchor = null, fallback = false;
+    if(pro){
+      anchor = {product:'TURBO', month:pro.m};
+    }else if(unconfirmed){
+      let cand = items.filter(it=>!it.toefl).concat(st.notren.map(toItem).filter(it=>it && it.product!=='TURBO' && !it.toefl));
+      if(cand.some(it=>it.product==='JUNIOR')) cand = cand.map(it=>it.product==='SMART' ? Object.assign({}, it, {product:'JUNIOR'}) : it);
+      let e = null;
+      cand.forEach(it=>{ if(!e || monthRank(it.month) < monthRank(e.month)) e = it; });
+      if(e){
+        anchor = {product:e.product, month:e.month};
+      }else{
+        // no earlier stream known at all: SMART, in the month of the SMART-PRO stream
+        let p = null;
+        st.raws.map(toItem).filter(it=>it && it.product==='TURBO').forEach(it=>{ if(!p || monthRank(it.month) < monthRank(p.month)) p = it; });
+        if(p){ anchor = {product:'SMART', month:p.month}; fallback = true; }
+      }
+    }else{
+      const anchorSrc = earliest || items[0] || null;
+      if(anchorSrc){
+        const turbo = items.filter(it=>it.product==='TURBO' && !it.toefl).sort((a,b)=>monthRank(a.month)-monthRank(b.month))[0];
+        const a = turbo || anchorSrc;
+        anchor = {product:a.product, month:a.month};
+      }
+    }
+    return {items, anchor, unconfirmed, fallback};
   }
 
   // The platform lists a student once per product row, so the same person (name + phone) can appear in
@@ -1410,8 +1521,12 @@
     const nameIdx = col(/^студент$/i);
     const phoneIdx = col(/^номер$/i);
     const mailIdx = col(/^почта$/i);
-    const idxs = [];
-    header.forEach((h,i)=>{ if(streamRe.test(h)) idxs.push(i); });
+    const idxs = [], notIdxs = [], sigIdxs = [];
+    header.forEach((h,i)=>{
+      if(streamRe.test(h)) idxs.push(i);
+      if(/^непродленн/i.test(h)) notIdxs.push(i);
+      if(/^(продленн|непродленн|купленн)/i.test(h) || /^поток\s*\d*$/i.test(h)) sigIdxs.push(i);
+    });
     if(prodIdx<0) throw new Error('«Продукт» бағаны табылмады');
     if(!idxs.length) throw new Error('Ағын бағандары табылмады');
     const students = new Map();
@@ -1423,14 +1538,18 @@
       const contact = (phoneIdx>=0 && String(row[phoneIdx]||'').trim()) || (mailIdx>=0 && String(row[mailIdx]||'').trim().toLowerCase()) || '';
       const key = (name && contact) ? name+'|'+contact : '#'+r; // no identity -> treat the row as its own student
       let st = students.get(key);
-      if(!st){ st = {rowProduct, rows:0, raws:new Set()}; students.set(key, st); }
+      if(!st){
+        st = {name: nameIdx>=0 ? String(row[nameIdx]||'').trim() : '', email: mailIdx>=0 ? proMail(row[mailIdx]) : '',
+              phone: phoneIdx>=0 ? proPhone(row[phoneIdx]) : '', rowProduct, rows:0, turboRows:0, signal:false, raws:new Set(), notren:new Set()};
+        students.set(key, st);
+      }
       st.rows++;
-      idxs.forEach(ci=>{
-        const raw = String(row[ci]||'').trim();
-        if(raw) st.raws.add(raw);
-      });
+      if(rowProduct==='TURBO'){ st.turboRows++; st.signal = true; }
+      idxs.forEach(ci=>{ const raw = String(row[ci]||'').trim(); if(raw) st.raws.add(raw); });
+      notIdxs.forEach(ci=>{ const raw = String(row[ci]||'').trim(); if(raw) st.notren.add(raw); });
+      sigIdxs.forEach(ci=>{ if(/SMART[-\s]?PRO/i.test(String(row[ci]||''))) st.signal = true; });
     }
-    return Array.from(students.values()).map(st=>({rowProduct: st.rowProduct, rows: st.rows, raws: Array.from(st.raws)}));
+    return Array.from(students.values()).map(st=>Object.assign({}, st, {raws:Array.from(st.raws), notren:Array.from(st.notren)}));
   }
 
   function parseRenewalCounts(workbook){
@@ -1447,27 +1566,18 @@
     const monthsFound = new Set();
     const groupsFound = new Set();
     // «Ұзарту отчеты» head-count follows the platform's rows: a person listed in two product rows counts
-    // twice (like the platform's own «Студенты Факт»); subject streams and money stay per person
+    // twice (like the platform's own «Студенты Факт»); subject streams and money stay per person.
+    // Exceptions around SMART PRO: a confirmed list member counts once; for a student with SMART-PRO signs that is
+    // NOT on a list, the extra TURBO row is not a student of its own.
     const bump = (g,m,renewed,n)=>{
       const k = g+'|'+m;
       if(!overall[k]) overall[k] = {count:0, total:0};
       overall[k].total += n;
       if(renewed) overall[k].count += n;
     };
-    collectStudents(rows, header, /^продленн/i).forEach(st=>{
-      const {items, anchor} = resolveStudentStreams(st.raws, st.rowProduct);
-      items.forEach(it=>{
-        monthsFound.add(it.month);
-        groupsFound.add(it.product);
-        const key = it.product+'|'+it.subject+'|'+it.month;
-        counts[key] = (counts[key]||0) + 1;
-      });
-      if(anchor){ groupsFound.add(anchor.product); bump(anchor.product, anchor.month, true, st.rows); }
-    });
 
-    // "Не оплатили" sheet: the students who did not renew join the denominator (same product/month rules).
-    let hasUnpaid = false;
-    const unpaidCounts = {}; // group|subject|month -> students who did NOT renew that stream
+    const paidSt = collectStudents(rows, header, /^продленн/i);
+    let unpaidSt = [], hasUnpaid = false;
     const unpaidName = workbook.SheetNames.find(n=>/^не\s*оплатили$/i.test(n.trim()));
     if(unpaidName){
       const urows = XLSX.utils.sheet_to_json(workbook.Sheets[unpaidName], {header:1, defval:''});
@@ -1475,18 +1585,42 @@
         const uh = urows[0].map(h=>String(h).trim());
         if(uh.some(h=>/^поток\s*\d*$/i.test(h))){
           hasUnpaid = true;
-          collectStudents(urows, uh, /^поток\s*\d*$/i).forEach(st=>{
-            const {items, anchor} = resolveStudentStreams(st.raws, st.rowProduct);
-            items.forEach(it=>{
-              const key = it.product+'|'+it.subject+'|'+it.month;
-              unpaidCounts[key] = (unpaidCounts[key]||0) + 1;
-            });
-            if(anchor){ groupsFound.add(anchor.product); monthsFound.add(anchor.month); bump(anchor.product, anchor.month, false, st.rows); }
-          });
+          unpaidSt = collectStudents(urows, uh, /^поток\s*\d*$/i);
         }
       }
     }
-    return {counts, unpaidCounts, overall: hasUnpaid ? overall : null, monthsFound: Array.from(monthsFound), groupsFound: Array.from(groupsFound)};
+    const idx = state.proIdx;
+    const useLists = !!(idx && idx.entries);
+    const proMap = assignPro(paidSt.concat(unpaidSt), idx);
+    const proInfo = {used:useLists, listed:0, listedPaid:0, unlisted:0, fallback:0, sizes: idx ? idx.size : {}};
+    const rowsFor = (st, pro)=> !useLists ? st.rows : (pro ? 1 : (st.signal ? Math.max(1, st.rows - st.turboRows) : st.rows));
+
+    paidSt.forEach(st=>{
+      const pro = proMap.get(st) || null;
+      const {items, anchor, unconfirmed, fallback} = resolveStudentStreams(st, pro, useLists);
+      if(pro){ proInfo.listed++; proInfo.listedPaid++; } else if(unconfirmed){ proInfo.unlisted++; if(fallback) proInfo.fallback++; }
+      items.forEach(it=>{
+        monthsFound.add(it.month);
+        groupsFound.add(it.product);
+        const key = it.product+'|'+it.subject+'|'+it.month;
+        counts[key] = (counts[key]||0) + 1;
+      });
+      if(anchor){ groupsFound.add(anchor.product); bump(anchor.product, anchor.month, true, rowsFor(st, pro)); }
+    });
+
+    // "Не оплатили" sheet: the students who did not renew join the denominator (same product/month rules).
+    const unpaidCounts = {}; // group|subject|month -> students who did NOT renew that stream
+    unpaidSt.forEach(st=>{
+      const pro = proMap.get(st) || null;
+      const {items, anchor} = resolveStudentStreams(st, pro, useLists);
+      if(pro) proInfo.listed++;
+      items.forEach(it=>{
+        const key = it.product+'|'+it.subject+'|'+it.month;
+        unpaidCounts[key] = (unpaidCounts[key]||0) + 1;
+      });
+      if(anchor){ groupsFound.add(anchor.product); monthsFound.add(anchor.month); bump(anchor.product, anchor.month, false, rowsFor(st, pro)); }
+    });
+    return {counts, unpaidCounts, proInfo, overall: hasUnpaid ? overall : null, monthsFound: Array.from(monthsFound), groupsFound: Array.from(groupsFound)};
   }
 
   // Strips the trailing " SMART ШІЛДЕ 11 СЫНЫП 2027"-style tail off a subject string,
@@ -1682,9 +1816,10 @@
     if(raw.junior && !migrated['JUNIOR|ШІЛДЕ']) migrated['JUNIOR|ШІЛДЕ'] = raw.junior;
     delete migrated.smart; delete migrated.junior;
     // fixed «жалпы» win over whatever was saved for the date (also fixes already-uploaded days)
-    Object.keys(OVERALL_TOTALS).forEach(k=>{
+    const planNow = overallPlan();
+    Object.keys(planNow).forEach(k=>{
       // a card edited by hand (manual flag) keeps its own numbers; the fixed plan only fills the rest
-      if(migrated[k] && !isMt(migrated[k])) migrated[k] = Object.assign({}, migrated[k], {count: migrated[k].count||0, total: OVERALL_TOTALS[k]});
+      if(migrated[k] && !isMt(migrated[k])) migrated[k] = Object.assign({}, migrated[k], {count: migrated[k].count||0, total: planNow[k]});
     });
 
     const isAll = state.activeMonth === ALL_MONTHS;
@@ -1975,6 +2110,64 @@
         body.appendChild(row);
       });
     });
+  }
+
+  // ---------- SMART PRO confirmed lists (upload + status) ----------
+  function renderProListPanel(){
+    const box = $('#proListPanel');
+    if(!box) return;
+    const pl = state.proLists || {entries:[], files:{}};
+    const sizes = (state.proIdx && state.proIdx.size) || {};
+    const slots = ['ТАМЫЗ', 'ҚЫРКҮЙЕК'];
+    let html = '<div class="hint" style="margin-bottom:12px;">Әр айдың тізімін Excel файлымен жүктеңіз (беттер: ИНФОМАТ, БИОХИМ …; баған «ОҚУШЫНЫҢ АТЫ-ЖӨНІ»). Тізімде жоқ, бірақ SMART-PRO ағыны бар оқушы бұрынғы ең ерте ағыны бойынша SMART/JUNIOR саналады. Тізімді жаңартқаннан кейін РОП файлын қайта жүктеңіз.</div><div class="prolist-grid">';
+    slots.forEach(m=>{
+      const f = pl.files[m];
+      html += '<div class="prolist-card"><div class="pl-title">'+m+'</div>'+
+        '<div class="pl-meta">'+(f ? escapeAttr(f.name)+'<br>'+f.count+' жол · '+escapeAttr(f.at||'') : 'Жүктелмеген')+'</div>'+
+        '<label class="btn" for="proFile_'+m+'">'+ic('upload')+' Файл жүктеу</label>'+
+        '<input type="file" id="proFile_'+m+'" class="file-input" accept=".xlsx,.xls"></div>';
+    });
+    const total = Object.keys(sizes).sort((a,b)=>monthRank(a)-monthRank(b)).map(m=>m+': <b>'+sizes[m]+'</b>').join(' · ');
+    html += '</div><div class="pl-sum">'+(total ? 'Тізімдегі оқушылар (айы — жүктелген файлдың айы): '+total+'. «Жалпы» (жоспар) өзгермейді — 322 / 309.' : 'Тізім жүктелмегенде SMART PRO бұрынғыдай ағын мәтіні бойынша саналады.')+'</div>';
+    if(pl.entries.length) html += '<button type="button" class="btn" id="proListClear" style="margin-top:12px;">'+ic('trash')+' Тізімді тазалау</button>';
+    box.innerHTML = html;
+    slots.forEach(m=>{
+      $('#proFile_'+m).addEventListener('change', e=>{ const f = e.target.files[0]; if(f) handleProListFile(m, f); e.target.value = ''; });
+    });
+    const clr = $('#proListClear');
+    if(clr) clr.addEventListener('click', async ()=>{
+      state.proLists = {entries:[], files:{}};
+      state.proIdx = buildProIndex([]);
+      await fsSetJSON('smartpro_lists', state.proLists);
+      renderProListPanel();
+      showUploadError('SMART PRO тізімі тазаланды. РОП файлын қайта жүктеңіз.');
+    });
+  }
+  async function handleProListFile(slot, file){
+    clearUploadError();
+    setLoading(true, 'Тізім оқылуда…');
+    try{
+      const wb = XLSX.read(await file.arrayBuffer(), {type:'array', cellStyles:true}); // cellStyles: needed to see rows hidden in Excel
+      const entries = parseProListWorkbook(wb, slot);
+      if(!entries.length) throw new Error('Тізімде оқушы табылмады («ОҚУШЫНЫҢ АТЫ-ЖӨНІ» бағаны бар беттер керек)');
+      const pl = state.proLists || {entries:[], files:{}};
+      pl.entries = pl.entries.filter(e=>e.s!==slot).concat(entries);
+      const d = new Date(), p2 = n=>String(n).padStart(2,'0');
+      pl.files[slot] = {name:file.name, count:entries.length, at:p2(d.getDate())+'.'+p2(d.getMonth()+1)+'.'+d.getFullYear()+' '+p2(d.getHours())+':'+p2(d.getMinutes())};
+      state.proLists = pl;
+      state.proIdx = buildProIndex(pl.entries);
+      const ok = await fsSetJSON('smartpro_lists', pl);
+      renderProListPanel();
+      if(ok === false) showSaveFailed();
+      else{
+        showUploadError('SMART PRO '+slot+' тізімі сақталды: '+entries.length+' жол. Енді РОП файлын қайта жүктеңіз.');
+        $('#uploadError').style.background = 'var(--sky-soft)'; $('#uploadError').style.color = 'var(--text)'; $('#uploadError').style.borderColor = 'rgba(62,198,224,.35)';
+      }
+    }catch(err){
+      showUploadError('Тізімді өңдеу кезінде қате шықты: '+err.message);
+    }finally{
+      setLoading(false);
+    }
   }
 
   function renderCopyTotalsPanel(){
@@ -2408,6 +2601,7 @@
     $('#mainContent').innerHTML='';
     $('#mainContent').appendChild(main);
     renderPanel(items);
+    renderProListPanel();
     renderFooter();
     polishUI();
 
@@ -2476,7 +2670,7 @@
       const buf = await file.arrayBuffer();
       const wb = XLSX.read(buf, {type:'array'});
       setLoading(true, 'Пәндер бойынша есептелуде…');
-      const {counts, unpaidCounts, overall, monthsFound, groupsFound} = parseRenewalCounts(wb);
+      const {counts, unpaidCounts, overall, monthsFound, groupsFound, proInfo} = parseRenewalCounts(wb);
 
       const newMonths = monthsFound.filter(m=>!state.knownMonths.includes(m));
       if(newMonths.length){
@@ -2532,9 +2726,10 @@
           const cur = overall[k] || {count:0, total:0};
           overall[k] = {count: isMc(e) ? e.count : cur.count, total: isMt(e) ? e.total : cur.total, manual:true, mc:isMc(e), mt:isMt(e)};
         });
-        Object.keys(OVERALL_TOTALS).forEach(k=>{
+        const planNow = overallPlan();
+        Object.keys(planNow).forEach(k=>{
           if(!overall[k]) overall[k] = {count:0, total:0};
-          if(!isMt(overall[k])) overall[k].total = OVERALL_TOTALS[k];
+          if(!isMt(overall[k])) overall[k].total = planNow[k];
         });
         await saveOverallData(today, overall);
       }
@@ -2549,6 +2744,10 @@
       if(newMonths.length) notices.push('жаңа кезең: '+newMonths.join(', '));
       if(newGroups.length) notices.push('жаңа продукт: '+newGroups.map(groupLabel).join(', '));
       const msgs = [];
+      if(proInfo){
+        if(proInfo.used) msgs.push('SMART PRO: тізімнен '+proInfo.listedPaid+' оқушы төледі; тізімде жоқ, бірақ SMART-PRO ағыны бар '+proInfo.unlisted+' оқушы бұрынғы ең ерте ағыны бойынша SMART/JUNIOR саналды'+(proInfo.fallback?' (олардың '+proInfo.fallback+'-інде бұрынғы ағын жоқ, SMART-PRO айы алынды)':'')+'.');
+        else msgs.push('SMART PRO тізімі жүктелмеген: SMART PRO ағын мәтіні бойынша саналды (баптау панелінен тізімді жүктеңіз).');
+      }
       if(notices.length) msgs.push('Файлда '+notices.join('; ')+' табылды. Тізімдерден таңдап, баптау панелінен жалпы санын енгізіңіз.');
       if(keptManual.length) msgs.push('Қолмен өзгертілген '+keptManual.length+' сан сақталды (файлдағы мәннен басым).');
       if(msgs.length){
@@ -2633,6 +2832,11 @@
       state.qolkhatUpdatedAt = qol.uploadedAt || null;
     }
     $('#qolkhatBadge').textContent = state.qolkhatList.length ? String(state.qolkhatList.length) : '';
+    state.proLists = (await fsGetJSON('smartpro_lists')) || {entries:[], files:{}};
+    if(!Array.isArray(state.proLists.entries)) state.proLists.entries = [];
+    if(!state.proLists.files) state.proLists.files = {};
+    state.proIdx = buildProIndex(state.proLists.entries);
+    renderProListPanel();
     state.juzengMonths = await loadJuzengMonths();
     if(state.juzengMonths.length){
       state.juzengActiveMonth = state.juzengMonths[state.juzengMonths.length-1];
