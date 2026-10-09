@@ -1555,11 +1555,14 @@
       let st = students.get(key);
       if(!st){
         st = {name: nameIdx>=0 ? String(row[nameIdx]||'').trim() : '', email: mailIdx>=0 ? proMail(row[mailIdx]) : '',
-              phone: phoneIdx>=0 ? proPhone(row[phoneIdx]) : '', rowProduct, rows:0, turboRows:0, toeflRows:0, toeflMonths:new Set(), signal:false, raws:new Set(), notren:new Set()};
+              phone: phoneIdx>=0 ? proPhone(row[phoneIdx]) : '', rowProduct, rows:0, turboRows:0, toeflRows:0, toeflRenewed:0, toeflMonths:new Set(), signal:false, raws:new Set(), notren:new Set()};
         students.set(key, st);
       }
       if(rowProduct==='TOEFL'){
         st.toeflRows++;
+        // renewed = the TOEFL ITP stream is among the renewed streams and something was paid (the unpaid sheet has no such column: nothing renewed)
+        const pIdx = header.findIndex(h=>/^оплатил$/i.test(h));
+        if(pIdx>=0 && (Number(row[pIdx])||0)>0 && idxs.some(ci=>/TOEFL/i.test(String(row[ci]||'')))) st.toeflRenewed++;
         row.forEach(cell=>{ const m = /TOEFL\s+ITP\s+(\S+)/i.exec(String(cell||'')); if(m) st.toeflMonths.add(m[1].toUpperCase()); });
       }else{
         if(!st.rows) st.rowProduct = rowProduct; // the product of the first non-TOEFL row
@@ -1632,7 +1635,7 @@
         const key = it.product+'|'+it.subject+'|'+it.month;
         counts[key] = (counts[key]||0) + 1;
       });
-      if(st.toeflRows){ const tm = toeflMonthOf(st); groupsFound.add('TOEFL'); monthsFound.add(tm); bump('TOEFL', tm, true, st.toeflRows); }
+      if(st.toeflRows){ const tm = toeflMonthOf(st); groupsFound.add('TOEFL'); monthsFound.add(tm); bump('TOEFL', tm, true, st.toeflRenewed); bump('TOEFL', tm, false, st.toeflRows - st.toeflRenewed); }
       if(anchor && st.rows){ groupsFound.add(anchor.product); bump(anchor.product, anchor.month, true, rowsFor(st, pro)); }
     });
 
