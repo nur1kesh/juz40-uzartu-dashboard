@@ -1133,14 +1133,23 @@
   // coming from the file / fixed plan. (Old saves only had `manual: true`: those were «жалпы» edits.)
   const isMt = e => !!(e && (e.mt || (e.manual && e.mc === undefined && e.mt === undefined)));
   const isMc = e => !!(e && e.mc);
-  // fixed «жалпы» per card (SMART PRO stays 322 / 309: the confirmed lists decide WHO counts, not the plan)
-  const overallPlan = ()=>Object.assign({}, OVERALL_TOTALS);
+  // fixed «жалпы» (plan) per card = «A жоспар» (ПЛАН БРАТЬ А): the renewal target of each stream
   const OVERALL_TOTALS = {
-    'SMART|ШІЛДЕ':5560, 'SMART|ТАМЫЗ':8706, 'SMART|ҚЫРКҮЙЕК':18655,
-    'JUNIOR|ШІЛДЕ':396, 'JUNIOR|ТАМЫЗ':616, 'JUNIOR|ҚЫРКҮЙЕК':2294,
-    'TURBO|ТАМЫЗ':322, 'TURBO|ҚЫРКҮЙЕК':309,
-    'TOEFL|ҚЫРКҮЙЕК':229
+    'SMART|ШІЛДЕ':4942,
+    'SMART|ТАМЫЗ':7158,
+    'SMART|ҚЫРКҮЙЕК':15120,
+    'SMART|ҚАЗАН':10334,
+    'JUNIOR|ШІЛДЕ':319,
+    'JUNIOR|ТАМЫЗ':470,
+    'JUNIOR|ҚЫРКҮЙЕК':1695,
+    'JUNIOR|ҚАЗАН':1799,
+    'TURBO|ТАМЫЗ':274,
+    'TURBO|ҚЫРКҮЙЕК':318,
+    'TURBO|ҚАЗАН':120,
+    'TOEFL|ҚЫРКҮЙЕК':190,
+    'TOEFL|ҚАЗАН':278
   };
+  const overallPlan = ()=>Object.assign({}, OVERALL_TOTALS);
   const MONTH_ORDER = ['ҚАҢТАР','АҚПАН','НАУРЫЗ','СӘУІР','МАМЫР','МАУСЫМ','ШІЛДЕ','ТАМЫЗ','ҚЫРКҮЙЕК','ҚАЗАН','ҚАРАША','ЖЕЛТОҚСАН'];
   function sortMonths(list){ return [...list].sort((a,b)=>MONTH_ORDER.indexOf(a)-MONTH_ORDER.indexOf(b)); }
   const ALL_MONTHS = '__ALL__';
@@ -1399,6 +1408,7 @@
   function parseProListWorkbook(wb, slotMonth){
     const out = [];
     wb.SheetNames.forEach(sn=>{
+      if(/ҮЛГІ|КОПИЯ|ШАБЛОН|TEMPLATE/i.test(sn)) return; // a sample/template sheet is not a course list
       const ws = wb.Sheets[sn];
       const rows = XLSX.utils.sheet_to_json(ws, {header:1, defval:''});
       const hiddenRows = ws['!rows'] || [];
@@ -2151,7 +2161,7 @@
     if(!box) return;
     const pl = state.proLists || {entries:[], files:{}};
     const sizes = (state.proIdx && state.proIdx.size) || {};
-    const slots = ['ТАМЫЗ', 'ҚЫРКҮЙЕК'];
+    const slots = ['ТАМЫЗ', 'ҚЫРКҮЙЕК', 'ҚАЗАН'];
     let html = '<div class="hint" style="margin-bottom:12px;">Әр айдың тізімін Excel файлымен жүктеңіз (беттер: ИНФОМАТ, БИОХИМ …; баған «ОҚУШЫНЫҢ АТЫ-ЖӨНІ»). Тізімде жоқ, бірақ SMART-PRO ағыны бар оқушы бұрынғы ең ерте ағыны бойынша SMART/JUNIOR саналады. Тізімді жаңартқаннан кейін РОП файлын қайта жүктеңіз.</div><div class="prolist-grid">';
     slots.forEach(m=>{
       const f = pl.files[m];
@@ -2161,7 +2171,7 @@
         '<input type="file" id="proFile_'+m+'" class="file-input" accept=".xlsx,.xls"></div>';
     });
     const total = Object.keys(sizes).sort((a,b)=>monthRank(a)-monthRank(b)).map(m=>m+': <b>'+sizes[m]+'</b>').join(' · ');
-    html += '</div><div class="pl-sum">'+(total ? 'Тізімдегі оқушылар (айы — жүктелген файлдың айы): '+total+'. «Жалпы» (жоспар) өзгермейді — 322 / 309.' : 'Тізім жүктелмегенде SMART PRO бұрынғыдай ағын мәтіні бойынша саналады.')+'</div>';
+    html += '</div><div class="pl-sum">'+(total ? 'Тізімдегі оқушылар (айы — жүктелген файлдың айы): '+total+'. «Жалпы» (жоспар) — A жоспар, тізім өзгертпейді.' : 'Тізім жүктелмегенде SMART PRO бұрынғыдай ағын мәтіні бойынша саналады.')+'</div>';
     if(pl.entries.length) html += '<button type="button" class="btn" id="proListClear" style="margin-top:12px;">'+ic('trash')+' Тізімді тазалау</button>';
     box.innerHTML = html;
     slots.forEach(m=>{
