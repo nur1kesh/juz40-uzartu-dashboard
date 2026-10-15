@@ -1134,6 +1134,7 @@
   const isMt = e => !!(e && (e.mt || (e.manual && e.mc === undefined && e.mt === undefined)));
   const isMc = e => !!(e && e.mc);
   // fixed «жалпы» (plan) per card = «A жоспар» (ПЛАН БРАТЬ А): the renewal target of each stream
+  const TOEFL_ONLY_SHARE = 0.23; // share of the TOEFL plan that is students studying ONLY TOEFL (51 of 221 TOEFL students in the 13.10 ROP)
   const OVERALL_TOTALS = {
     'SMART|ШІЛДЕ':4942,
     'SMART|ТАМЫЗ':7158,
@@ -1645,7 +1646,9 @@
         const key = it.product+'|'+it.subject+'|'+it.month;
         counts[key] = (counts[key]||0) + 1;
       });
-      if(st.toeflRows){ const tm = toeflMonthOf(st); groupsFound.add('TOEFL'); monthsFound.add(tm); bump('TOEFL', tm, true, st.toeflRenewed); bump('TOEFL', tm, false, st.toeflRows - st.toeflRenewed); }
+      if(st.toeflRows){ const tm = toeflMonthOf(st); groupsFound.add('TOEFL'); monthsFound.add(tm); bump('TOEFL', tm, true, st.toeflRenewed); bump('TOEFL', tm, false, st.toeflRows - st.toeflRenewed);
+        // a student who studies ONLY TOEFL belongs to ЖАЛПЫ; one who also studies something else is already counted there
+        if(!st.rows){ const o = overall['TOEFL|'+tm]; o.oc = (o.oc||0) + st.toeflRenewed; o.ot = (o.ot||0) + st.toeflRows; } }
       if(anchor && st.rows){ groupsFound.add(anchor.product); bump(anchor.product, anchor.month, true, rowsFor(st, pro)); }
     });
 
@@ -1659,7 +1662,8 @@
         const key = it.product+'|'+it.subject+'|'+it.month;
         unpaidCounts[key] = (unpaidCounts[key]||0) + 1;
       });
-      if(st.toeflRows){ const tm = toeflMonthOf(st); groupsFound.add('TOEFL'); monthsFound.add(tm); bump('TOEFL', tm, false, st.toeflRows); }
+      if(st.toeflRows){ const tm = toeflMonthOf(st); groupsFound.add('TOEFL'); monthsFound.add(tm); bump('TOEFL', tm, false, st.toeflRows);
+        if(!st.rows){ const o = overall['TOEFL|'+tm]; o.ot = (o.ot||0) + st.toeflRows; } }
       if(anchor && st.rows){ groupsFound.add(anchor.product); monthsFound.add(anchor.month); bump(anchor.product, anchor.month, false, rowsFor(st, pro)); }
     });
     return {counts, unpaidCounts, proInfo, overall: hasUnpaid ? overall : null, monthsFound: Array.from(monthsFound), groupsFound: Array.from(groupsFound)};
@@ -1867,22 +1871,24 @@
     const isAll = state.activeMonth === ALL_MONTHS;
     const groupData = state.knownGroups.map(g=>{
       if(isAll){
-        let count=0, total=0, has=false;
+        let count=0, total=0, oc=0, has=false;
         state.knownMonths.forEach(m=>{
           const k = g+'|'+m;
-          if(migrated[k]){ count += migrated[k].count||0; total += migrated[k].total||0; has = true; }
+          if(migrated[k]){ count += migrated[k].count||0; total += migrated[k].total||0; oc += migrated[k].oc||0; has = true; }
         });
-        return {group:g, key:null, d:{count,total}, has};
+        return {group:g, key:null, d:{count,total}, oc, has};
       }
       const key = g+'|'+state.activeMonth;
-      return {group:g, key, d: migrated[key] || {count:0,total:0}, has: !!migrated[key]};
+      return {group:g, key, d: migrated[key] || {count:0,total:0}, oc: (migrated[key] && migrated[key].oc) || 0, has: !!migrated[key]};
     });
     const hasData = groupData.some(gd=>gd.has);
     if(!hasData && !state.isAdmin) return wrap; // nothing to show a viewer yet for this stream
 
     // ЖАЛПЫ = SMART + JUNIOR + SMART PRO; TOEFL is a product of its own and is not part of the fixed ЖАЛПЫ plan
-    const totalCount = groupData.filter(gd=>gd.group!=='TOEFL').reduce((s,gd)=>s+(gd.d.count||0),0);
-    const totalTotal = groupData.filter(gd=>gd.group!=='TOEFL').reduce((s,gd)=>s+(gd.d.total||0),0);
+    // ЖАЛПЫ = SMART + JUNIOR + SMART PRO students + the students who study ONLY TOEFL (a TOEFL student with another course is already in it, never twice)
+    const tg = groupData.find(gd=>gd.group==='TOEFL');
+    const totalCount = groupData.filter(gd=>gd.group!=='TOEFL').reduce((s,gd)=>s+(gd.d.count||0),0) + (tg ? tg.oc : 0);
+    const totalTotal = groupData.filter(gd=>gd.group!=='TOEFL').reduce((s,gd)=>s+(gd.d.total||0),0) + (tg ? Math.round((tg.d.total||0)*TOEFL_ONLY_SHARE) : 0);
 
     const hintText = isAll ? 'Барлық кезеңдер қосылған жалпы көрсеткіш' : (state.activeMonth+' ағымы бойынша жалпы көрсеткіш');
     wrap.innerHTML = `<div class="section-head" style="margin-top:0;"><h2>Ұзарту отчеты</h2><div class="hint">${hintText}</div></div>`;
